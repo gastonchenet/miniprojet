@@ -7,5 +7,34 @@
       <h2>{props.title}</h2>
     </a>
     <searchbar />
+    <div class="account">
+      <a href="/favorites" if={state.connected} class="favorites">
+        Favorites
+      </a>
+      <p if={state.connected} class="account-name">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="4" fill="currentColor"/>
+          <path fill="currentColor" fill-opacity="0.25" fill-rule="evenodd" d="M12 13c-3.67 0-6.68 2.42-6.976 5.5c-.026.275.2.5.476.5h13a.465.465 0 0 0 .476-.5C18.68 15.42 15.67 13 12 13" clip-rule="evenodd"/>
+        </svg>
+        <span>{state.account.name}</span>
+      </p>
+      <button if={state.connected} class="logout">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+          <path fill="currentColor" d="m17 8l-1.41 1.41L17.17 11H9v2h8.17l-1.58 1.58L17 16l4-4zM5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5z"/>
+        </svg>
+      </button>
+      <a href="/login" class="connexion-button login" if={!state.connected}>
+        Login
+      </a>
+      <a href="/register" class="connexion-button register" if={!state.connected}>
+        Sign Up
+      </a>
+    </div>
   </header>
+  <script>
+    export default {
+      state: {
+      },
+    }
+  </script>
 </navbar>

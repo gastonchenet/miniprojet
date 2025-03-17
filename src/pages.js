@@ -10,5 +10,17 @@ export default [
     path: "/favorites(/?[?#].*)?(#.*)?",
     label: "Favorites",
     componentName: "favorites"
+  },
+  {
+    href: "/login",
+    path: "/login(/?[?#].*)?(#.*)?",
+    label: "Login",
+    componentName: "login"
+  },
+  {
+    href: "/register",
+    path: "/register(/?[?#].*)?(#.*)?",
+    label: "Register",
+    componentName: "register"
   }
 ]
