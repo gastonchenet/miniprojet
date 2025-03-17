@@ -1,0 +1,44 @@
+<app>
+  <div class="container">
+    <navbar title={props.title} />
+    <router>
+      <route each={page in state.pages} path={page.href}>
+        <main is={page.componentName} route={route} />
+        <not-found if={state.showNotFound} />
+      </route>
+    </router>
+  </div>
+  <script>
+    import { Router, Route, route, toRegexp, match } from "@riotjs/route";
+    import pages from "./pages";
+    import Home from "./pages/home.riot";
+    import Favorites from "./pages/favorites.riot"
+    import NotFound from "./pages/not-found.riot";
+
+    export default {
+      components: {
+        Router,
+        Route,
+        Home,
+        Favorites,
+        NotFound,
+      },
+      state: {
+        pages,
+        showNotFound: false,
+      },
+      onMounted(props, state) {
+        this.anyRouteStream = route("(.*)");
+        
+        this.anyRouteStream.on.value((path) => {
+          this.update({
+            showNotFound: !this.state.pages.some((p) => match(path.pathname, toRegexp(p?.path)))
+          });
+        });
+      },
+      onUnmounted() {
+        this.anyRouteStream.end();
+      }
+    }
+  </script>
+</app>
