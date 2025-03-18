@@ -5,7 +5,7 @@ const basename = (path, extension = "") =>
 
 const globalComponentsContext = import.meta.webpackContext(
   "./components/global/",
-  { recursive: true, regExp: /[a-zA-Z0-9-]+\.riot/ },
+  { recursive: true, regExp: /[a-zA-Z0-9-]+\.riot/ }
 );
 
 export default () => {

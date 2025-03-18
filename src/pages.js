@@ -3,24 +3,24 @@ export default [
     href: "/",
     path: "/(/?[?#].*)?(#.*)?",
     label: "Home",
-    componentName: "home"
+    componentName: "home",
   },
   {
     href: "/favorites",
     path: "/favorites(/?[?#].*)?(#.*)?",
     label: "Favorites",
-    componentName: "favorites"
+    componentName: "favorites",
   },
   {
     href: "/login",
     path: "/login(/?[?#].*)?(#.*)?",
     label: "Login",
-    componentName: "login"
+    componentName: "login",
   },
   {
     href: "/register",
     path: "/register(/?[?#].*)?(#.*)?",
     label: "Register",
-    componentName: "register"
-  }
-]
+    componentName: "register",
+  },
+];

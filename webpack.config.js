@@ -65,7 +65,7 @@ export default {
       {
         test: /\.scss$/i,
         use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
-      }
+      },
     ],
   },
   plugins: [
