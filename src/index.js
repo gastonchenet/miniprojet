@@ -1,14 +1,15 @@
 import "./styles/main.scss";
 import "./styles/navbar.scss";
 import "./styles/auth.scss";
+import "./styles/release.scss";
 
 import "@riotjs/hot-reload";
 import { component } from "riot";
 import registerGlobalComponents from "./register-global-components.js";
-import App from "./app.riot";
+import Router from "./router.riot";
 
 registerGlobalComponents();
 
-component(App)(document.getElementById("app"), {
+component(Router)(document.getElementById("app"), {
   title: "Kittify",
 });

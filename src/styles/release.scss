@@ -1,0 +1,55 @@
+.illustrations {
+  display: flex;
+  gap: 0.75rem;
+  flex-direction: column;
+  width: 500px;
+
+  .selected {
+    height: 500px;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 0.25rem;
+    border: 1px solid #ccc;
+  }
+
+  .selections-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-radius: 0.25rem;
+
+    .selections {
+      display: flex;
+      gap: 0.75rem;
+      width: max-content;
+
+      .select-button {
+        height: 100px;
+        width: 100px;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        transition: 250ms ease;
+        border: 1px solid #ccc;
+        overflow: hidden;
+        transition: 0.3s ease;
+
+        .selectable-illustration {
+          height: 100px;
+          width: 100px;
+          object-fit: cover;
+          filter: brightness(0.9);
+          transition: 0.3s ease;
+        }
+
+        &:hover {
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          border-radius: 1.5rem;
+
+          .selectable-illustration {
+            transform: scale(1.1) rotate(2deg);
+            filter: brightness(1);
+          }
+        }
+      }
+    }
+  }
+}

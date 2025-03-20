@@ -1,0 +1,16 @@
+<releases class="releases">
+  <a each={release in props.releases} class="release" href={`/releases/${release.id}`}>
+    <div class="illustration-container">
+      <img src={release.thumb || this.placeholder} alt={release.title} class="illustration" />
+    </div>
+    <div class="text-info">
+      <h2 class="title">{release.title}</h2>
+      <p class="artist">{release.artist}</p>
+      <p class="year">{release.year}</p>
+    </div>
+  </a>
+  <script>
+    import placeholder from "../../assets/images/placeholder.png";
+    export default { placeholder }
+  </script>
+</releases>

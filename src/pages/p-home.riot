@@ -1,0 +1,63 @@
+<home>
+  <div class="content">
+    <div if={state.releases === null} class="loader" />
+    <releases releases={state.releases} if={state.releases !== null} />
+  </div>
+  <script>
+    import { router, getCurrentRoute } from "@riotjs/route";
+
+    export default {
+      state: {
+        releases: null,
+      },
+      async fill(query, type) {
+        console.log(query, type);
+
+        const url = new URL("https://api.discogs.com/database/search");
+        url.searchParams.append("page", 1);
+        url.searchParams.append("per_page", 50);
+        url.searchParams.append("q", query ?? "");
+        url.searchParams.append("type", type ?? "release");
+
+        const res = await fetch(url.toString(), {
+          headers: {
+            Authorization : "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG" 
+          }
+        });
+
+        const data = await res.json();
+
+        this.update({
+          releases: data.results.map((result) => ({
+            id: result.id,
+            title: result.title.split(/\s*-\s*/)[1],
+            artist: result.title.split(/\s*-\s*/)[0],
+            year: result.year,
+            thumb: result.thumb,
+          })),
+        });
+
+        console.log(data);
+      },
+      onMounted() {
+        router.on.value((path) => {
+          const params = new URLSearchParams(path);
+          this.fill(params.get("q"), params.get("type"));
+        });
+
+        const currentRoute = getCurrentRoute();
+          
+        if (currentRoute.startsWith("http")) {
+          const url = new URL(currentRoute);
+          this.fill(url.searchParams.get("q"), url.searchParams.get("type"));
+        } else {
+          const params = new URLSearchParams(currentRoute);
+          this.fill(params.get("q"), params.get("type"));
+        }
+      },
+      onUnmounted() {
+        // router.end();
+      }
+    }
+  </script>
+</home>

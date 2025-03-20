@@ -1,0 +1,39 @@
+<release>
+  <div if={state.release === null} class="loader" />
+  <div if={state.release !== null}>
+    <div class="illustrations">
+      <img src={state.selectedImage} alt={state.release.title} class="selected" />
+      <div class="selections-container">
+        <div class="selections">
+          <button each={image in state.release.images} onclick={() => this.selectImage(image.uri)} class="select-button">
+            <img src={image.uri} alt={state.release.title} class="selectable-illustration" />
+          </button>
+        </div>
+      </div>
+    </div>
+    <p>{state.release.artists[0].name}</p>
+    <p>{state.release.title}</p>
+  </div>
+  <script>
+    export default {
+      state: {
+        release: null,
+        selectedImage: null,
+      },
+      selectImage(image) {
+        this.update({ selectedImage: image });
+      },
+      async onMounted(props) {
+        const res = await fetch(`https://api.discogs.com/releases/${props.params.id}`, {
+          headers: {
+            Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
+          }
+        });
+
+        const data = await res.json();
+        console.log(data);
+        this.update({ release: data, selectedImage: data.images[0].uri });
+      }
+    }
+  </script>
+</release>

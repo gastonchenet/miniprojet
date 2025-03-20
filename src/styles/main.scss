@@ -6,3 +6,150 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.loader {
+  width: 40px;
+  aspect-ratio: 1;
+  position: relative;
+  margin-block: auto;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: -8px 0 0 -8px;
+    width: 16px;
+    aspect-ratio: 1;
+    background: #3fb8af;
+    animation:
+      l1-1 2s infinite,
+      l1-2 0.5s infinite;
+  }
+
+  &::after {
+    background: #ff3d7f;
+    animation-delay: -1s, 0s;
+  }
+}
+
+@keyframes l1-1 {
+  0% {
+    top: 0;
+    left: 0;
+  }
+  25% {
+    top: 100%;
+    left: 0;
+  }
+  50% {
+    top: 100%;
+    left: 100%;
+  }
+  75% {
+    top: 0;
+    left: 100%;
+  }
+  100% {
+    top: 0;
+    left: 0;
+  }
+}
+
+@keyframes l1-2 {
+  80%,
+  100% {
+    transform: rotate(0.5turn);
+  }
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+
+  .loading {
+    margin-block: auto;
+  }
+
+  .releases {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    width: 100%;
+    padding: 2.5rem;
+    max-width: 1200px;
+    gap: 1.5rem;
+    height: max-content;
+
+    .release {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+      border-radius: 0.25rem;
+      overflow: hidden;
+      text-decoration: none;
+      color: unset;
+      transition: 0.3s ease;
+
+      .illustration-container {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+
+        .illustration {
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+          filter: brightness(0.9);
+          transition: 0.3s ease;
+        }
+      }
+
+      .text-info {
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .title {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #333;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .artist {
+          font-size: 1rem;
+          color: #666;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .year {
+          font-size: 0.875rem;
+          color: #999;
+          transition: 0.3s ease;
+        }
+      }
+
+      &:hover {
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 2rem;
+
+        .illustration {
+          transform: scale(1.1) rotate(2deg);
+          filter: brightness(1);
+        }
+
+        .text-info .year {
+          transform: translateX(0.5rem);
+        }
+      }
+    }
+  }
+}

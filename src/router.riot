@@ -1,0 +1,68 @@
+<app>
+  <div class="container">
+    <navbar title={props.title} user={state.user} />
+    <router>
+      <route each={page in state.pages} path={page.path}>
+        <main is={page.componentName} params={route.params} />
+        <not-found if={state.showNotFound} />
+      </route>
+    </router>
+  </div>
+  <script>
+    import { Router, Route, route, toRegexp, match, setBase } from "@riotjs/route";
+    import { auth, db } from "./firebase";
+    import pages from "./pages";
+    import Home from "./pages/p-home.riot";
+    import Favorites from "./pages/p-favorites.riot";
+    import Login from "./pages/p-login.riot";
+    import Register from "./pages/p-register.riot";
+    import Release from "./pages/p-release.riot";
+    import NotFound from "./pages/p-not-found.riot";
+
+    export default {
+      components: {
+        Router,
+        Route,
+        Home,
+        Favorites,
+        Login,
+        Register,
+        Release,
+        NotFound,
+      },
+      state: {
+        pages,
+        showNotFound: false,
+        user: auth.currentUser,
+      },
+      onBeforeMount() {
+        auth.onAuthStateChanged(async () => {
+          if (auth.currentUser) {
+            const userData = await db.collection("users").doc(auth.currentUser.uid).get();
+
+            this.state.user = {
+              ...userData.data(),
+              ...auth.currentUser,
+            }
+          }
+
+          this.update();
+        });
+      },
+      onMounted(props, state) {
+        setBase("/");
+
+        this.anyRouteStream = route("(.*)")
+        
+        this.anyRouteStream.on.value((path) => {
+          this.update({
+            showNotFound: !this.state.pages.some((p) => match(path.pathname, toRegexp(p?.path)))
+          });  
+        });
+      },
+      onUnmounted() {
+        this.anyRouteStream.end();
+      },
+    }
+  </script>
+</app>

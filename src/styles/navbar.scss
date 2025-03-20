@@ -60,6 +60,7 @@
       font-size: 0.9rem;
       color: #333;
       padding-inline: 0.5rem;
+      text-transform: capitalize;
 
       .caret {
         transform: rotate(-180deg);
@@ -81,6 +82,7 @@
       transition: 250ms ease;
       border-radius: 0.25rem;
       overflow: hidden;
+      z-index: 999;
 
       .element {
         width: $searchwidth;
@@ -91,6 +93,7 @@
         transition: 250ms ease;
         font-size: 0.9rem;
         color: #333;
+        text-transform: capitalize;
 
         &:hover {
           background: #e5e5e5;
@@ -171,8 +174,8 @@
       color: #333;
       margin-inline: 1rem;
       display: flex;
-      gap: 0.4rem;
       align-items: center;
+      gap: 0.4rem;
     }
 
     .favorites {
@@ -188,7 +191,7 @@
         width: 0;
         height: 2px;
         background: #333;
-        bottom: 0;
+        bottom: -2px;
         left: 0;
         transition: 250ms ease;
       }

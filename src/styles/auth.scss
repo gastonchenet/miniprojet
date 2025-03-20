@@ -73,5 +73,41 @@
       font-size: 0.8rem;
       font-weight: 700;
     }
+
+    .or {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-block: 0.5rem;
+
+      .line {
+        height: 1px;
+        background: #ccc;
+        width: 100%;
+      }
+
+      .text {
+        font-size: 0.8rem;
+        color: #333;
+      }
+    }
+  }
+}
+
+.signin-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: 250ms ease;
+  gap: 0.5rem;
+
+  &:hover {
+    background: #f0f0f0;
   }
 }

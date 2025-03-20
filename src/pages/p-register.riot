@@ -44,46 +44,17 @@
       </div>
       <p class="error" if={state.error !== null}>{state.error}</p>
       <button type="submit" class="submit-button">Sign Up</button>
+      <div class="or">
+        <span class="line"></span>
+        <span class="text">OR</span>
+        <span class="line"></span>
+      </div>
+      <signin-google />
     </form>
   </section>
   <script>
-    import firebase from "firebase/compat/app";
-    import "firebase/compat/auth";
-    import "firebase/compat/firestore";
-
-    firebase.initializeApp({
-      apiKey: "AIzaSyD9AGJjSHp8zlA2NhnS0y1mMda8XwpDe-c",
-      authDomain: "riot-a9eca.firebaseapp.com",
-      projectId: "riot-a9eca",
-    });
-
-    function setCookie(name, value, days) {
-      const expires = new Date(Date.now() + days * 864e5).toUTCString();
-      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-    }
-
-    function getCookie(name) {
-      return document.cookie.split("; ").reduce((r, v) => {
-        const parts = v.split("=");
-        return parts[0] === name ? decodeURIComponent(parts[1]) : r;
-      }, "");
-    }
-
-    async function saveIdToCookie(user) {
-      const idToken = await user.getIdToken();
-      setCookie("idToken", idToken, 1);
-    }
-
-    async function saveUserData(uid, username, email) {
-      await db.collection("users").doc(uid).set({
-        username,
-        email,
-        favorites: [],
-      });
-    }
-
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    import { auth, db } from "../firebase";
+    import { router } from "@riotjs/route";
 
     export default {
       state: {
@@ -92,7 +63,9 @@
         error: null,
       },
       onMounted() {
-        if (document.cookie.split("; ").some((v) => v.startsWith("idToken"))) window.location.href = "/";
+        auth.onAuthStateChanged((user) => {
+          if (auth.currentUser) router.push("/");
+        });
       },
       togglePasswordVisibility() {
         const passwordField = this.$("input[name='password']");
@@ -124,10 +97,13 @@
         
         try {
           const userCredentials = await auth.createUserWithEmailAndPassword(email, password);
+          
+          await db.collection("users").doc(userCredentials.user.uid).set({
+            username,
+            favorites: [],
+          });
 
-          await saveUserData(userCredentials.user.uid, username, email, password);
-          await saveIdToCookie(userCredentials.user);
-          window.location.href = "/";
+          router.push("/");
         } catch (error) {
           this.update({
             error: error.message.replace(/(Firebase:|\(.*\).?)/g, "").trim()
