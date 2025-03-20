@@ -17,6 +17,7 @@
     import Login from "./pages/p-login.riot";
     import Register from "./pages/p-register.riot";
     import Release from "./pages/p-release.riot";
+    import Artist from "./pages/p-artist.riot";
     import NotFound from "./pages/p-not-found.riot";
 
     export default {
@@ -28,6 +29,7 @@
         Login,
         Register,
         Release,
+        Artist,
         NotFound,
       },
       state: {
@@ -55,9 +57,7 @@
         this.anyRouteStream = route("(.*)")
         
         this.anyRouteStream.on.value((path) => {
-          this.update({
-            showNotFound: !this.state.pages.some((p) => match(path.pathname, toRegexp(p?.path)))
-          });  
+          this.update();   
         });
       },
       onUnmounted() {

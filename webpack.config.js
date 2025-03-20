@@ -11,6 +11,7 @@ export default {
     path: path.resolve("./dist"),
     filename: "[name].bundle.js",
     clean: true,
+    publicPath: "/",
   },
   devtool: "source-map",
   optimization: {

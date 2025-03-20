@@ -1,5 +1,5 @@
 <releases class="releases">
-  <a each={release in props.releases} class="release" href={`/releases/${release.id}`}>
+  <a each={release in props.releases} class="release" href={`/release/${release.id}`}>
     <div class="illustration-container">
       <img src={release.thumb || this.placeholder} alt={release.title} class="illustration" />
     </div>

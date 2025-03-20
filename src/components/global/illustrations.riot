@@ -1,0 +1,38 @@
+<illustrations class="illustrations">
+  <img src={state.selectedImage} alt={props.title} class="selected" />
+  <div class="selections-container">
+    <div class="selections">
+      <button each={image in props.images} onclick={() => this.selectImage(image.uri)} class="select-button">
+        <img src={image.uri} alt={props.title} class="selectable-illustration" />
+      </button>
+    </div>
+  </div>
+  <script>
+    export default {
+      state: {
+        selectedImage: null,
+      },
+      selectImage(image) {
+        this.update({ selectedImage: image });
+      },
+      onMounted() {
+        this.selectImage(this.props.images[0].uri);
+
+        const selectionsContainer = this.$(".selections-container");
+        let lastScroll = 0;
+
+        selectionsContainer.addEventListener("wheel", (e) => {
+          e.preventDefault();
+
+          if (Date.now() - lastScroll < 250) return;
+          lastScroll = Date.now();
+
+          selectionsContainer.scroll({
+            left: selectionsContainer.scrollLeft + e.deltaY,
+            behavior: "smooth",
+          });
+        });
+      }
+    }
+  </script>
+</illustrations>

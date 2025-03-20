@@ -20,8 +20,13 @@ export default [
     componentName: "register",
   },
   {
-    path: "/releases/:id",
+    path: "/release/:id",
     label: "Release",
     componentName: "release",
+  },
+  {
+    path: "/artist/:id",
+    label: "Artist",
+    componentName: "artist",
   },
 ];

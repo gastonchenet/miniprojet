@@ -1,55 +1,335 @@
-.illustrations {
+.page-content {
   display: flex;
-  gap: 0.75rem;
   flex-direction: column;
-  width: 500px;
+  align-items: center;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
 
-  .selected {
-    height: 500px;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: 0.25rem;
-    border: 1px solid #ccc;
-  }
+  .release-container {
+    display: flex;
+    padding: 4rem;
+    gap: 2rem;
 
-  .selections-container {
-    overflow-x: auto;
-    overflow-y: hidden;
-    border-radius: 0.25rem;
-
-    .selections {
+    .illustrations {
       display: flex;
       gap: 0.75rem;
-      width: max-content;
+      flex-direction: column;
+      width: 28dvw;
 
-      .select-button {
-        height: 100px;
-        width: 100px;
+      .selected {
+        height: 28dvw;
+        aspect-ratio: 1;
+        object-fit: cover;
         border-radius: 0.25rem;
-        cursor: pointer;
-        transition: 250ms ease;
         border: 1px solid #ccc;
-        overflow: hidden;
-        transition: 0.3s ease;
+      }
 
-        .selectable-illustration {
-          height: 100px;
-          width: 100px;
-          object-fit: cover;
-          filter: brightness(0.9);
-          transition: 0.3s ease;
-        }
+      .selections-container {
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-radius: 0.25rem;
 
-        &:hover {
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          border-radius: 1.5rem;
+        .selections {
+          display: flex;
+          gap: 0.75rem;
+          width: max-content;
 
-          .selectable-illustration {
-            transform: scale(1.1) rotate(2deg);
-            filter: brightness(1);
+          .select-button {
+            height: 100px;
+            width: 100px;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: 250ms ease;
+            border: 1px solid #ccc;
+            overflow: hidden;
+            transition: 0.3s ease;
+
+            .selectable-illustration {
+              height: 100px;
+              width: 100px;
+              object-fit: cover;
+              filter: brightness(0.9);
+              transition: 0.3s ease;
+            }
+
+            &:hover {
+              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+              border-radius: 1.5rem;
+
+              .selectable-illustration {
+                transform: scale(1.1) rotate(2deg);
+                filter: brightness(1);
+              }
+            }
           }
         }
       }
     }
+
+    .see-options {
+      color: #666;
+      cursor: pointer;
+      transition: 250ms ease;
+      text-decoration: underline;
+      border: none;
+      background: none;
+
+      &:hover {
+        color: #333;
+      }
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      width: 52dvw;
+
+      .title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      .artist-data {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        .artist {
+          font-size: 1.25rem;
+          color: #666;
+
+          .artist-href {
+            color: unset;
+            text-decoration: none;
+          }
+        }
+
+        .country {
+          margin-inline: 0.5rem;
+          background: #e82946;
+          color: #fff;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+          font-size: 0.75rem;
+        }
+      }
+
+      .members {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+
+        .member {
+          background: #2949e8;
+          color: #fff;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+          font-size: 0.75rem;
+          text-decoration: none;
+          transition: 250ms ease;
+
+          &:hover {
+            background: #1e3ac4;
+          }
+
+          &.inactive {
+            background: #ddd;
+            color: #666;
+
+            &:hover {
+              background: #ccc;
+            }
+          }
+        }
+      }
+
+      .urls {
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+        line-height: 1.5;
+
+        .url {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          width: fit-content;
+
+          img {
+            border-radius: 0.25rem;
+          }
+        }
+      }
+
+      .real-name {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+      }
+
+      .variations {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        color: #666;
+        row-gap: 0.25rem;
+
+        .variation {
+          &::after {
+            content: "•";
+            margin-inline: 0.75rem;
+            color: #ccc;
+          }
+
+          &:last-child::after {
+            content: "";
+            margin-inline: 0;
+          }
+
+          &:nth-last-child(2)::after {
+            content: "";
+            margin-inline: 0.5rem;
+          }
+        }
+      }
+
+      .music-details {
+        display: flex;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+
+        @mixin genreStyle {
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+          font-size: 0.75rem;
+          margin-inline-end: 0.5rem;
+        }
+
+        .genre {
+          @include genreStyle;
+          background: #2dba82;
+          color: #fff;
+        }
+
+        .style {
+          @include genreStyle;
+          background: #219466;
+          color: #fff;
+        }
+      }
+
+      .note-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+
+        .note {
+          font-size: 1rem;
+          color: #111;
+          line-height: 1.5;
+          white-space: pre-wrap;
+
+          &.hidden {
+            display: -webkit-box;
+            line-clamp: 8;
+            -webkit-line-clamp: 8;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+
+        .expand-note {
+          color: #666;
+          cursor: pointer;
+          transition: 250ms ease;
+          text-decoration: underline;
+          border: none;
+          background: none;
+          text-align: start;
+        }
+      }
+
+      .tracklist {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .track {
+          display: flex;
+          flex-direction: column;
+          color: #111;
+
+          .extra-artists {
+            font-size: 0.75rem;
+            color: #666;
+            margin-block: 0.25rem;
+            padding-left: 1rem;
+            line-height: 1.5;
+          }
+
+          .track-text-data {
+            display: flex;
+            align-items: center;
+
+            .position {
+              font-size: 0.75rem;
+              font-weight: 900;
+              color: #888;
+              text-transform: capitalize;
+
+              &::after {
+                content: ".";
+                margin-inline-end: 0.5rem;
+              }
+            }
+
+            .heading {
+              font-size: 0.6rem;
+              font-weight: 700;
+              margin-inline-end: 0.5rem;
+              color: #666;
+              text-transform: capitalize;
+              text-transform: uppercase;
+              background: #f0f0f0;
+              padding: 0.25rem 0.5rem;
+              border-radius: 0.25rem;
+            }
+
+            .duration {
+              font-size: 0.75rem;
+              color: #888;
+              margin-inline-start: auto;
+              padding-left: 0.5rem;
+            }
+
+            .name {
+              font-size: 1rem;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.releases-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  .releases-title {
+    width: calc(80dvw + 2rem);
   }
 }
