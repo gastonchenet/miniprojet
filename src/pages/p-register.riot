@@ -53,7 +53,7 @@
     </form>
   </section>
   <script>
-    import { auth, db } from "../firebase";
+    import { auth, db, waitUntilAuthReady } from "../utils/firebase";
     import { router } from "@riotjs/route";
 
     export default {
@@ -62,10 +62,9 @@
         confirmPasswordVisible: false,
         error: null,
       },
-      onMounted() {
-        auth.onAuthStateChanged((user) => {
-          if (auth.currentUser) router.push("/");
-        });
+      async onMounted() {
+        await waitUntilAuthReady()
+        if (auth.currentUser) router.push("/");
       },
       togglePasswordVisibility() {
         const passwordField = this.$("input[name='password']");
@@ -100,7 +99,9 @@
           
           await db.collection("users").doc(userCredentials.user.uid).set({
             username,
-            favorites: [],
+            favoriteReleases: [],
+            favoriteArtists: [],
+            favoriteMasters: [],
           });
 
           router.push("/");

@@ -66,6 +66,63 @@
       }
     }
 
+    .community {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .like-container {
+        position: relative;
+        border-radius: 50%;
+        height: 2.5rem;
+        width: 2.5rem;
+        border: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .like {
+          font-size: 2.45rem;
+          background: none;
+        }
+      }
+
+      .star-notation {
+        display: flex;
+        align-items: center;
+        padding-inline: 1rem;
+        border: 1px solid #ccc;
+        height: 2.5rem;
+        border-radius: calc(2.5rem / 2);
+        width: fit-content;
+        gap: 0.5rem;
+
+        .stars {
+          display: flex;
+          gap: 0.25rem;
+
+          .filled {
+            color: #ffce2b;
+          }
+
+          .unfilled {
+            color: #ccc;
+          }
+        }
+
+        .notation {
+          font-weight: 700;
+          color: #333;
+        }
+
+        .vote-count {
+          font-size: 0.75rem;
+          color: #666;
+        }
+      }
+    }
+
     .see-options {
       color: #666;
       cursor: pointer;
@@ -256,65 +313,90 @@
         }
       }
 
-      .tracklist {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+      .tracklist-container {
+        border-radius: 0.25rem;
+        border: 1px solid #ccc;
+        overflow: hidden;
+        transition: 250ms ease;
+        max-height: 28rem;
 
-        .track {
+        .tracklist-title {
+          background: #f0f0f0;
+          padding-inline: 1rem;
+          height: 3rem;
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #333;
+          border: none;
+          transition: 250ms ease;
+          display: flex;
+          align-items: center;
+          width: 100%;
+        }
+
+        .tracklist {
+          list-style: none;
           display: flex;
           flex-direction: column;
-          color: #111;
+          gap: 0.5rem;
+          padding: 1rem;
+          overflow-y: auto;
+          max-height: 25rem;
 
-          .extra-artists {
-            font-size: 0.75rem;
-            color: #666;
-            margin-block: 0.25rem;
-            padding-left: 1rem;
-            line-height: 1.5;
-          }
-
-          .track-text-data {
+          .track {
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            color: #111;
 
-            .position {
+            .extra-artists {
               font-size: 0.75rem;
-              font-weight: 900;
-              color: #888;
-              text-transform: capitalize;
-
-              &::after {
-                content: ".";
-                margin-inline-end: 0.5rem;
-              }
-            }
-
-            .heading {
-              font-size: 0.6rem;
-              font-weight: 700;
-              margin-inline-end: 0.5rem;
               color: #666;
-              text-transform: capitalize;
-              text-transform: uppercase;
-              background: #f0f0f0;
-              padding: 0.25rem 0.5rem;
-              border-radius: 0.25rem;
+              margin-block: 0.25rem;
+              padding-left: 1rem;
+              line-height: 1.5;
             }
 
-            .duration {
-              font-size: 0.75rem;
-              color: #888;
-              margin-inline-start: auto;
-              padding-left: 0.5rem;
-            }
+            .track-text-data {
+              display: flex;
+              align-items: center;
 
-            .name {
-              font-size: 1rem;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+              .position {
+                font-size: 0.75rem;
+                font-weight: 900;
+                color: #888;
+                text-transform: capitalize;
+
+                &::after {
+                  content: ".";
+                  margin-inline-end: 0.5rem;
+                }
+              }
+
+              .heading {
+                font-size: 0.6rem;
+                font-weight: 700;
+                margin-inline-end: 0.5rem;
+                color: #666;
+                text-transform: capitalize;
+                text-transform: uppercase;
+                background: #f0f0f0;
+                padding: 0.25rem 0.5rem;
+                border-radius: 0.25rem;
+              }
+
+              .duration {
+                font-size: 0.75rem;
+                color: #888;
+                margin-inline-start: auto;
+                padding-left: 0.5rem;
+              }
+
+              .name {
+                font-size: 1rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
             }
           }
         }

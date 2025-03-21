@@ -83,6 +83,7 @@
       border-radius: 0.25rem;
       overflow: hidden;
       z-index: 999;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 
       .element {
         width: $searchwidth;
@@ -101,7 +102,7 @@
       }
 
       &.visible {
-        transform: translateY(2px);
+        transform: translateY(5px);
         opacity: 1;
         pointer-events: all;
       }

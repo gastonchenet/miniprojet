@@ -2,7 +2,26 @@
   <section class="page-content">
     <div if={state.release === null} class="loader" />
     <div if={state.release !== null} class="release-container">
-      <illustrations images={state.release.images} title={state.release.title} />
+      <div>
+        <illustrations images={state.release.images} title={state.release.title} />
+        <div class="community">
+          <div class="star-notation">
+            <div class="stars">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48" class="star filled" each={star in new Array(Math.floor(state.rating.average))}>
+                <path fill="currentColor" stroke="currentColor" stroke-linejoin="round" stroke-width="4" d="m23.999 5l-6.113 12.478L4 19.49l10.059 9.834L11.654 43L24 36.42L36.345 43L33.96 29.325L44 19.491l-13.809-2.013z"/>
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48" class="star unfilled" each={star in new Array(5 - Math.floor(state.rating.average))}>
+                <path fill="currentColor" stroke="currentColor" stroke-linejoin="round" stroke-width="4" d="m23.999 5l-6.113 12.478L4 19.49l10.059 9.834L11.654 43L24 36.42L36.345 43L33.96 29.325L44 19.491l-13.809-2.013z"/>
+              </svg>
+            </div>
+            <p class="notation">{state.rating.average}</p>
+            <p class="vote-count">({state.rating.count.toLocaleString("en-US")} votes)</p>
+          </div>
+          <div class="like-container">
+            <like releaseId={state.release.id} liked={state.isFavorite} />
+          </div>
+        </div>
+      </div>
       <div class="info">
         <h2 class="title">{state.release.title}<span if={state.release.year}>{" "}({state.release.year})</span></h2>
         <div class="artist-data">
@@ -17,49 +36,69 @@
         </div>
         <div class="note-container">
           <pre class={state.noteExpanded ? "note" : "note hidden"} if={!!state.release.notes}></pre>
-          <button class="expand-note" if={!!state.release.notes && state.release.notes.split("\n").length > 7} onclick={toggleExpandNotes}>{state.noteExpanded ? "hide" : "show"} note</button>
+          <button class="expand-note" if={!!state.release.notes && state.release.notes.split("\n").length > 6} onclick={toggleExpandNotes}>{state.noteExpanded ? "hide" : "show"} note</button>
         </div>
-        <ul class="tracklist">
-          <li each={track in state.release.tracklist} class="track">
-            <p class="track-text-data">
-              <span class="position" if={track.type_ !== "heading"}>{track.position}</span>
-              <span if={track.type_ === "heading"} class="heading">Heading</span>
-              <span class="name">{track.title}</span>
-              <span if={!!track.duration} class="duration">{track.duration}</span>
-            </p>
-            <div class="extra-artists">
-              <p each={artist in track.extraartists}>
-                <span>{artist.role}</span>{" - "}
-                <a href={`/artist/${artist.id}`}>{artist.name}</a>
+        <div class="tracklist-container">
+          <h4 class="tracklist-title">Tracklist ({state.release.tracklist.length})</h4>
+          <ul class="tracklist">
+            <li each={track in state.release.tracklist} class="track">
+              <p class="track-text-data">
+                <span class="position" if={track.type_ !== "heading"}>{track.position}</span>
+                <span if={track.type_ === "heading"} class="heading">Heading</span>
+                <span class="name">{track.title}</span>
+                <span if={!!track.duration} class="duration">{track.duration}</span>
               </p>
-            </div>
-          </li>
-        </ul>
+              <div class="extra-artists">
+                <p each={artist in track.extraartists}>
+                  <span>{artist.role}</span>{" - "}
+                  <a href={`/artist/${artist.id}`}>{artist.name}</a>
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
   <script>
+    import { toggleLike, isFavorite } from "../utils/favorites";
+    import { waitUntilAuthReady } from "../utils/firebase";
+
     export default {
       state: {
         release: null,
+        rating: null,
         noteExpanded: false,
+        isFavorite: false,
       },
       toggleExpandNotes() {
         this.update({ noteExpanded: !this.state.noteExpanded });
       },
       async onMounted(props) {
-        const res = await fetch(`https://api.discogs.com/releases/${props.params.id}`, {
+        await waitUntilAuthReady();
+        const fetchOptions = {
           headers: {
             Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
-          }
-        });
+          },
+        };
+        
+        const responses = await Promise.all([
+          fetch(`https://api.discogs.com/releases/${props.params.id}`, fetchOptions),
+          fetch(`https://api.discogs.com/releases/${props.params.id}/rating`, fetchOptions),
+        ]);
 
-        const data = await res.json();
-        console.log(data);
-        this.update({ release: data, selectedImage: data.images[0].uri });
+        const [release, stats, fav] = await Promise.all([
+          ...responses.map((response) => response.json()),
+          isFavorite(parseInt(props.params.id), "release"),
+        ]);
 
-        if (data.notes) {
-          const note = data.notes
+        console.log(release);
+        console.log(stats);
+        console.log(fav);
+        this.update({ release, rating: stats.rating, selectedImage: release.images[0].uri, isFavorite: fav });
+
+        if (release.notes) {
+          const note = release.notes
           .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (match, url, text) => {
             if (url.startsWith("http")) return text;
             return `<a href='${url}' class='link'>${text}</a>`;
@@ -70,6 +109,25 @@
 
           this.$("pre.note").innerHTML = note[0].toUpperCase() + note.slice(1);
         }
+
+        const like = this.$(".like");
+
+        this.likeListener = like.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          like.classList.toggle("liked");
+
+          toggleLike({
+            id: release.id,
+            title: release.title,
+            thumb: release.thumb,
+            artist: release.artists[0].name,
+            year: release.year,
+          }, "release");
+        });
+      },
+      onBeforeUnmount() {
+        this.$(".like").removeEventListener("click", this.likeListener);
       }
     }
   </script>

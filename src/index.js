@@ -2,6 +2,7 @@ import "./styles/main.scss";
 import "./styles/navbar.scss";
 import "./styles/auth.scss";
 import "./styles/release.scss";
+import "./styles/like.scss";
 
 import "@riotjs/hot-reload";
 import { component } from "riot";

@@ -1,16 +1,92 @@
 <releases class="releases">
-  <a each={release in props.releases} class="release" href={`/release/${release.id}`}>
-    <div class="illustration-container">
-      <img src={release.thumb || this.placeholder} alt={release.title} class="illustration" />
-    </div>
-    <div class="text-info">
-      <h2 class="title">{release.title}</h2>
-      <p class="artist">{release.artist}</p>
-      <p class="year">{release.year}</p>
-    </div>
-  </a>
+  <div class="releases-container">
+    <button each={release in props.releases} class="release" data-release-id={release.id}>
+      <div class="illustration-container">
+        <img src={release.thumb || this.placeholder} alt={release.title} class="illustration" />
+      </div>
+      <div class="text-info">
+        <h2 class="title">{release.title}</h2>
+        <p class="artist">{release.artist}</p>
+        <p class="year">{release.year}</p>
+      </div>
+      <div class="like-container">
+        <like releaseId={release.id} liked={state.favorites.includes(release.id)} />
+      </div>
+    </button>
+  </div>
   <script>
     import placeholder from "../../assets/images/placeholder.png";
-    export default { placeholder }
+    import { router } from "@riotjs/route";
+    import { toggleLike, getFavorites } from "../../utils/favorites";
+    import { waitUntilAuthReady } from "../../utils/firebase";
+
+    export default {
+      placeholder,
+      state: {
+        favorites: [],
+      },
+      onMounted() {
+        let lastClick = [0, null];
+
+        waitUntilAuthReady().then(() => {
+          getFavorites().then((favorites) => {
+            this.update({ favorites: favorites[this.props.type].map((f) => f.id) });
+          });
+        });
+
+        this.likeListener = this.$(".releases-container").addEventListener("click", (e) => {
+          const a = e.target.closest(".release");
+          const b = e.target.closest(".like");
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (b && a ) {
+            const releaseId = a.getAttribute("data-release-id");
+            b.classList.toggle("liked");
+
+            toggleLike({
+              id: parseInt(releaseId),
+              title: a.querySelector(".title").textContent,
+              thumb: a.querySelector(".illustration").src,
+              artist: a.querySelector(".artist").textContent,
+              year: parseInt(a.querySelector(".year").textContent),
+            }, this.props.type);
+
+            return;
+          }
+          
+          if (!a) return;
+          
+          const releaseId = a.getAttribute("data-release-id");
+          const like = a.querySelector(".like");
+          const now = Date.now();
+
+          if (lastClick[1] === releaseId && now - lastClick[0] < 250) {
+            like.classList.toggle("liked");
+
+            toggleLike({
+              id: parseInt(releaseId),
+              title: a.querySelector(".title").textContent,
+              thumb: a.querySelector(".illustration").src,
+              artist: a.querySelector(".artist").textContent,
+              year: parseInt(a.querySelector(".year").textContent),
+            }, this.props.type);
+
+            lastClick = [0, null];
+          } else {
+            lastClick = [now, releaseId];
+            
+            setTimeout(() => {
+              if (lastClick[1] !== releaseId) return;
+              router.push(`/${this.props.type}/${releaseId}`);
+            }, 300);
+          }
+        });
+      },
+      onBeforeUnmount() {
+        this.$(".releases-container").removeEventListener("click", this.likeListener);
+      }
+    }
   </script>
 </releases>

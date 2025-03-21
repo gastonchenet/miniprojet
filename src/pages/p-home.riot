@@ -1,23 +1,32 @@
 <home>
   <div class="content">
     <div if={state.releases === null} class="loader" />
-    <releases releases={state.releases} if={state.releases !== null} />
+    <div if={state.releases !== null} class="page-content-container">
+      <h2 class="results" if={state.fromSearch}>{state.items.toLocaleString("en-US")} results</h2>
+      <releases releases={state.releases} if={state.releases !== null} type={state.type} />
+    </div>
   </div>
   <script>
     import { router, getCurrentRoute } from "@riotjs/route";
 
     export default {
       state: {
+        items: 0,
         releases: null,
+        fromSearch: false,
+        query: "",
+        type: "release",
       },
-      async fill(query, type) {
-        console.log(query, type);
+      async fill() {
+        const currentUrl = new URL(window.location.href);
+        this.state.query = currentUrl.searchParams.get("q") || "";
+        this.state.type = currentUrl.searchParams.get("type") || "release";
 
         const url = new URL("https://api.discogs.com/database/search");
         url.searchParams.append("page", 1);
         url.searchParams.append("per_page", 50);
-        url.searchParams.append("q", query ?? "");
-        url.searchParams.append("type", type ?? "release");
+        url.searchParams.append("q", this.state.query);
+        url.searchParams.append("type", this.state.type);
 
         const res = await fetch(url.toString(), {
           headers: {
@@ -26,7 +35,6 @@
         });
 
         const data = await res.json();
-        console.log(data);
 
         this.update({
           releases: data.results.map((result) => ({
@@ -36,28 +44,33 @@
             year: result.year,
             thumb: result.thumb,
           })),
+          items: data.pagination.items,
+          fromSearch: !!this.state.query,
+          updating: false,
         });
 
         console.log(data);
       },
       onMounted() {
-        router.on.value((path) => {
-          const params = new URLSearchParams(path);
-          this.fill(params.get("q"), params.get("type"));
-        });
-
-        const currentRoute = getCurrentRoute();
-          
-        if (currentRoute.startsWith("http")) {
-          const url = new URL(currentRoute);
-          this.fill(url.searchParams.get("q"), url.searchParams.get("type"));
-        } else {
-          const params = new URLSearchParams(currentRoute);
-          this.fill(params.get("q"), params.get("type"));
-        }
+        this.fill();
       },
-      onUnmounted() {
-        // router.end();
+      onUpdated() {
+        let url = getCurrentRoute() || window.location.href;
+
+        if (!url.startsWith("http")) {
+          url = window.location.origin + url;
+        }
+
+        const currentUrl = new URL(url);
+        const currentQuery = currentUrl.searchParams.get("q") || "";
+        const currentType = currentUrl.searchParams.get("type") || "release";
+
+        if (
+          currentQuery !== this.state.query ||
+          currentType !== this.state.type
+        ) {
+          this.fill();
+        }
       }
     }
   </script>

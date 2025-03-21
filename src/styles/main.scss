@@ -84,14 +84,27 @@ a {
     margin-block: auto;
   }
 
+  .page-content-container .results {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #333;
+    margin-top: 2.5rem;
+    margin-left: 2.5rem;
+  }
+
   .releases {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    width: 100%;
-    padding: 2.5rem;
-    max-width: calc(80dvw + 2rem);
-    gap: 1.5rem;
-    height: max-content;
+    display: flex;
+    flex-direction: column;
+
+    .releases-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      width: 100%;
+      padding: 2.5rem;
+      max-width: calc(80dvw + 2rem);
+      gap: 1.5rem;
+      height: max-content;
+    }
 
     .release {
       display: flex;
@@ -102,6 +115,10 @@ a {
       text-decoration: none;
       color: unset;
       transition: 0.3s ease;
+      position: relative;
+      text-align: start;
+      background: unset;
+      cursor: pointer;
 
       .illustration-container {
         width: 100%;
@@ -114,6 +131,22 @@ a {
           object-fit: cover;
           filter: brightness(0.9);
           transition: 0.3s ease;
+        }
+      }
+
+      .like-container {
+        transform: translateY(-3rem);
+        opacity: 0;
+        transition: 0.3s ease;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        border-radius: 50%;
+
+        &:has(.like.liked) {
+          transform: translateY(0);
+          opacity: 1;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
       }
 
@@ -151,6 +184,12 @@ a {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         border-radius: 2rem;
 
+        .like-container {
+          transform: translateY(0);
+          opacity: 1;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
         .illustration {
           transform: scale(1.1) rotate(2deg);
           filter: brightness(1);
@@ -168,7 +207,7 @@ a {
     overflow-y: unset;
     flex-direction: column;
 
-    .releases {
+    .releases-container {
       padding: 0;
       padding-bottom: 2.5rem;
     }

@@ -33,17 +33,16 @@
     </form>
   </section>
   <script>
-    import { auth } from "../firebase";
+    import { auth, waitUntilAuthReady } from "../utils/firebase";
     import { router } from "@riotjs/route";
 
     export default {
       state: {
         passwordVisible: false,
       },
-      onMounted() {
-        auth.onAuthStateChanged((user) => {
-          if (auth.currentUser) router.push("/");
-        });
+      async onMounted() {
+        await waitUntilAuthReady()
+        if (auth.currentUser) router.push("/");
       },
       togglePasswordVisibility() {
         const passwordField = this.$("input[name='password']");

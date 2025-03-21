@@ -10,7 +10,7 @@
   </button>
   <script>
     import firebase from "firebase/compat/app";
-    import { auth, db } from "../../firebase";
+    import { auth, db } from "../../utils/firebase";
     import { router } from "@riotjs/route";
 
     export default {
@@ -25,7 +25,9 @@
           if (!userDoc) {
             await db.collection("users").doc(user.uid).set({
               username: user.displayName,
-              favorites: [],
+              favoriteReleases: [],
+              favoriteArtists: [],
+              favoriteMasters: [],
             });
           }
 

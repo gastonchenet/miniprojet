@@ -19,7 +19,7 @@
         <p class="real-name" if={!!state.artist.realname}>{state.artist.realname}</p>
         <div class="note-container">
           <pre class={state.noteExpanded ? "note" : "note hidden"} if={!!state.artist.profile}></pre>
-          <button class="expand-note" if={!!state.artist.profile && state.artist.profile.split("\n").length > 7} onclick={toggleExpandNotes}>{state.noteExpanded ? "hide" : "show"} note</button>
+          <button class="expand-note" if={!!state.artist.profile && state.artist.profile.split("\n").length > 6} onclick={toggleExpandNotes}>{state.noteExpanded ? "hide" : "show"} note</button>
         </div>
         <ul class="urls">
           <li class="title-url" each={url in state.artist.urls.filter((url) => url.includes("https://"))}>
@@ -32,8 +32,8 @@
       </div>
     </div>
     <section class="content artist" if={state.releases !== null}>
-      <h2 class="title">Releases <span class="results">({state.releases.pagination.items})</span></h2>
-      <releases releases={state.releases.releases} if={state.releases !== null} />
+      <h2 class="title">Releases <span class="results">({state.pagination.items.toLocaleString("en-US")})</span></h2>
+      <releases releases={state.releases} type="release" />
     </section>
   </section>
   <script>
@@ -41,6 +41,7 @@
       state: {
         artist: null,
         releases: null,
+        pagination: null,
         slicedVariations: true,
         seeInactives: false,
         noteExpanded: false,
@@ -66,10 +67,11 @@
           fetch(`https://api.discogs.com/artists/${props.params.id}/releases`, fetchOptions),
         ]);
 
-        const [artist, releases] = await Promise.all(responses.map((response) => response.json()));
-        this.update({ artist, releases });
+        const [artist, { releases, pagination }] = await Promise.all(responses.map((response) => response.json()));
+        this.update({ artist, releases, pagination });
         console.log(artist);
         console.log(releases);
+        console.log(pagination);
 
         if (artist.profile) {
           const note = artist.profile
