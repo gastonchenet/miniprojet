@@ -1,0 +1,117 @@
+<master>
+  <section class="page-content">
+    <div if={state.master === null} class="loader" />
+    <div if={state.master !== null} class="release-container">
+      <div>
+        <illustrations images={state.master.images} title={state.master.title} />
+        <div class="community">
+          <div class="like-container">
+            <like masterId={state.master.id} liked={state.isFavorite} />
+          </div>
+        </div>
+      </div>
+      <div class="info">
+        <h2 class="title">{state.master.title}<span if={state.master.year}>{" "}({state.master.year})</span></h2>
+        <div class="artist-data">
+          <h3 class="artist">
+            <a class="artist-href" href={`/artist/${state.master.artists[0].id}`}>{state.master.artists[0].name}</a>
+          </h3>
+        </div>
+        <div class="music-details">
+          <p each={genre in state.master.genres} class="genre">{genre}</p>
+          <p each={style in state.master.styles} class="style">{style}</p>
+        </div>
+        <div class="note-container">
+          <pre class={state.noteExpanded ? "note" : "note hidden"} if={!!state.master.notes}></pre>
+          <button class="expand-note" if={!!state.master.notes && state.master.notes.split("\n").length > 6} onclick={toggleExpandNotes}>{state.noteExpanded ? "hide" : "show"} note</button>
+        </div>
+        <div class="tracklist-container">
+          <h4 class="tracklist-title">Tracklist ({state.master.tracklist.length})</h4>
+          <ul class="tracklist">
+            <li each={track in state.master.tracklist} class="track">
+              <p class="track-text-data">
+                <span class="position" if={track.type_ !== "heading"}>{track.position}</span>
+                <span if={track.type_ === "heading"} class="heading">Heading</span>
+                <span class="name">{track.title}</span>
+                <span if={!!track.duration} class="duration">{track.duration}</span>
+              </p>
+              <div class="extra-artists">
+                <p each={artist in track.extraartists}>
+                  <span>{artist.role}</span>{" - "}
+                  <a href={`/artist/${artist.id}`}>{artist.name}</a>
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    import { toggleLike, isFavorite } from "../utils/favorites";
+    import { waitUntilAuthReady } from "../utils/firebase";
+
+    export default {
+      state: {
+        master: null,
+        rating: null,
+        noteExpanded: false,
+        isFavorite: false,
+      },
+      toggleExpandNotes() {
+        this.update({ noteExpanded: !this.state.noteExpanded });
+      },
+      async onMounted(props) {
+        await waitUntilAuthReady();
+        const fetchOptions = {
+          headers: {
+            Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
+          },
+        };
+        
+        const res = await fetch(`https://api.discogs.com/masters/${props.params.id}`, fetchOptions);
+
+        const [master, fav] = await Promise.all([
+          res.json(),
+          isFavorite(parseInt(props.params.id), "master"),
+        ]);
+
+        console.log(master);
+        console.log(fav);
+        this.update({ master, selectedImage: master.images[0].uri, isFavorite: fav });
+
+        if (master.notes) {
+          const note = master.notes
+          .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (match, url, text) => {
+            if (url.startsWith("http")) return text;
+            return `<a href='${url}' class='link'>${text}</a>`;
+          })
+          .replace(/\[r=([^\]]*)\]/g, "<a href='/master/$1' class='link'>here</a>")
+          .replace(/\[[^\]]*\]/g, "")
+          .trim();
+
+          this.$("pre.note").innerHTML = note[0].toUpperCase() + note.slice(1);
+        }
+
+        const like = this.$(".like");
+
+        this.likeListener = like.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          like.classList.toggle("liked");
+
+          toggleLike({
+            id: master.id,
+            title: master.title,
+            thumb: master.images[0].uri,
+            artist: master.artists[0].name,
+            year: master.year,
+          }, "master");
+        });
+      },
+      onBeforeUnmount() {
+        this.$(".like").removeEventListener("click", this.likeListener);
+      }
+    }
+  </script>
+</master>

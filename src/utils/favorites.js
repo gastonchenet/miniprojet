@@ -7,17 +7,39 @@ const fieldMap = {
   master: "favoriteMasters",
 };
 
+let favoritesCache = {
+  release: [],
+  artist: [],
+  master: [],
+  filled: false,
+  get all() {
+    return this.release.concat(this.artist, this.master);
+  },
+  get count() {
+    return this.release.length + this.artist.length + this.master.length;
+  },
+};
+
+export const listener = new EventTarget();
+
 export async function getFavorites() {
+  if (favoritesCache.filled) {
+    return favoritesCache;
+  }
+
   const favorites = {
     release: [],
     artist: [],
     master: [],
+    get count() {
+      return this.release.length + this.artist.length + this.master.length;
+    },
+    get all() {
+      return this.release.concat(this.artist, this.master);
+    },
   };
 
-  if (!auth.currentUser) {
-    console.error("User is not logged in");
-    return;
-  }
+  if (!auth.currentUser) return favorites;
 
   const userId = auth.currentUser.uid;
   const userRef = db.collection("users").doc(userId);
@@ -39,10 +61,16 @@ export async function getFavorites() {
     console.error("Error loading favorites:", error);
   }
 
+  favoritesCache.release = favorites.release;
+  favoritesCache.artist = favorites.artist;
+  favoritesCache.master = favorites.master;
+  favoritesCache.filled = true;
+
   return favorites;
 }
 
 export async function isFavorite(id, type) {
+  if (!auth.currentUser) return false;
   const favorites = await getFavorites();
   return favorites[type].some((item) => item.id === id);
 }
@@ -52,6 +80,10 @@ export async function toggleLike(favorite, type) {
     console.error("User is not logged in");
     return;
   }
+
+  if (isNaN(favorite.year)) delete favorite.year;
+  if (!favorite.title) delete favorite.title;
+  favorite.type = type;
 
   const userId = auth.currentUser.uid;
   const userRef = db.collection("users").doc(userId);
@@ -71,22 +103,29 @@ export async function toggleLike(favorite, type) {
 
     const userData = doc.data();
     const favoritesArray = userData[fieldName] || [];
-    const exists = favoritesArray.some((item) => item.id === favorite.id);
+    const exists = favoritesArray.find((item) => item.id === favorite.id);
 
     if (exists) {
       await userRef.update({
-        [fieldName]: arrayRemove(favorite),
+        [fieldName]: arrayRemove(exists),
       });
 
+      favoritesCache[type] = favoritesCache[type].filter(
+        (item) => item.id !== favorite.id
+      );
       console.log(`${type} removed from favorites`);
     } else {
+      console.log(fieldName);
       await userRef.update({
         [fieldName]: arrayUnion(favorite),
       });
 
+      favoritesCache[type].push(favorite);
       console.log(`${type} added to favorites`);
     }
   } catch (error) {
     console.error("Error updating favorites:", error);
   }
+
+  listener.dispatchEvent(new Event("update"));
 }

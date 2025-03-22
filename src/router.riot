@@ -1,6 +1,6 @@
 <app>
   <div class="container">
-    <navbar title={props.title} user={state.user} />
+    <navbar title={props.title} />
     <router>
       <route each={page in state.pages} path={page.path}>
         <main is={page.componentName} params={route.params} />
@@ -17,6 +17,7 @@
     import Login from "./pages/p-login.riot";
     import Register from "./pages/p-register.riot";
     import Release from "./pages/p-release.riot";
+    import Master from "./pages/p-master.riot";
     import Artist from "./pages/p-artist.riot";
     import NotFound from "./pages/p-not-found.riot";
 
@@ -28,6 +29,7 @@
         Favorites,
         Login,
         Register,
+        Master,
         Release,
         Artist,
         NotFound,
@@ -35,20 +37,6 @@
       state: {
         pages,
         showNotFound: false,
-        user: auth.currentUser,
-      },
-      async onBeforeMount() {
-        await waitUntilAuthReady()
-        if (auth.currentUser) {
-          const userData = await db.collection("users").doc(auth.currentUser.uid).get();
-
-          this.state.user = {
-            ...userData.data(),
-            ...auth.currentUser,
-          }
-        }
-
-        this.update();
       },
       onMounted(props, state) {
         setBase("/");

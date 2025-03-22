@@ -12,5 +12,5 @@ import Router from "./router.riot";
 registerGlobalComponents();
 
 component(Router)(document.getElementById("app"), {
-  title: "Kittify",
+  title: "Diskitty",
 });

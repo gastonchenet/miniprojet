@@ -1,16 +1,17 @@
 <releases class="releases">
   <div class="releases-container">
-    <button each={release in props.releases} class="release" data-release-id={release.id}>
+    <button each={release in props.releases} class="release" data-release-id={release.id} data-release-type={props.type || release.type}>
       <div class="illustration-container">
         <img src={release.thumb || this.placeholder} alt={release.title} class="illustration" />
+        <p if={!props.type} class={`type ${release.type}`}>{release.type}</p>
       </div>
       <div class="text-info">
         <h2 class="title">{release.title}</h2>
-        <p class="artist">{release.artist}</p>
+        <p class={release.title ? "artist" : state.artistOnly ? "title artist-title" : "title"}>{release.artist}</p>
         <p class="year">{release.year}</p>
       </div>
-      <div class="like-container">
-        <like releaseId={release.id} liked={state.favorites.includes(release.id)} />
+      <div class="like-container" if={!props.hideLikeButton}>
+        <like releaseId={release.id} liked={state.favorites[props.type || release.type].includes(release.id)} />
       </div>
     </button>
   </div>
@@ -23,42 +24,59 @@
     export default {
       placeholder,
       state: {
-        favorites: [],
+        favorites: {
+          release: [],
+          master: [],
+          artist: [],
+        },
+        artistOnly: false,
       },
-      onMounted() {
+      onMounted(props) {
         let lastClick = [0, null];
+        
+        this.update({ artistOnly: props.releases.every((r) => r.type === "artist") });
 
-        waitUntilAuthReady().then(() => {
-          getFavorites().then((favorites) => {
-            this.update({ favorites: favorites[this.props.type].map((f) => f.id) });
+        if (!this.props.hideLikeButton) waitUntilAuthReady().then(async () => {
+            const favorites = await getFavorites();
+
+            this.update({
+              favorites: {
+                release: favorites.release.map((f) => f.id),
+                master: favorites.master.map((f) => f.id),
+                artist: favorites.artist.map((f) => f.id),
+              }
+            });
           });
-        });
 
         this.likeListener = this.$(".releases-container").addEventListener("click", (e) => {
           const a = e.target.closest(".release");
           const b = e.target.closest(".like");
+          if (!a) return;
 
           e.preventDefault();
           e.stopPropagation();
 
-          if (b && a ) {
-            const releaseId = a.getAttribute("data-release-id");
+          const releaseId = parseInt(a.getAttribute("data-release-id"));
+          const releaseType = a.getAttribute("data-release-type");
+
+          if (this.props.hideLikeButton) {
+            router.push(`/${releaseType}/${releaseId}`);
+          }
+
+          if (b) {
             b.classList.toggle("liked");
 
             toggleLike({
-              id: parseInt(releaseId),
+              id: releaseId,
               title: a.querySelector(".title").textContent,
               thumb: a.querySelector(".illustration").src,
               artist: a.querySelector(".artist").textContent,
               year: parseInt(a.querySelector(".year").textContent),
-            }, this.props.type);
+            }, releaseType);
 
             return;
           }
           
-          if (!a) return;
-          
-          const releaseId = a.getAttribute("data-release-id");
           const like = a.querySelector(".like");
           const now = Date.now();
 
@@ -66,12 +84,12 @@
             like.classList.toggle("liked");
 
             toggleLike({
-              id: parseInt(releaseId),
+              id: releaseId,
               title: a.querySelector(".title").textContent,
               thumb: a.querySelector(".illustration").src,
               artist: a.querySelector(".artist").textContent,
               year: parseInt(a.querySelector(".year").textContent),
-            }, this.props.type);
+            }, releaseType);
 
             lastClick = [0, null];
           } else {
@@ -79,7 +97,7 @@
             
             setTimeout(() => {
               if (lastClick[1] !== releaseId) return;
-              router.push(`/${this.props.type}/${releaseId}`);
+              router.push(`/${releaseType}/${releaseId}`);
             }, 300);
           }
         });

@@ -25,6 +25,11 @@ export default [
     componentName: "release",
   },
   {
+    path: "/master/:id",
+    label: "Master",
+    componentName: "master",
+  },
+  {
     path: "/artist/:id",
     label: "Artist",
     componentName: "artist",

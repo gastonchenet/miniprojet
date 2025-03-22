@@ -57,7 +57,7 @@
       justify-content: space-between;
       gap: 0.4rem;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       color: #333;
       padding-inline: 0.5rem;
       text-transform: capitalize;
@@ -92,9 +92,11 @@
         padding-block: 0.5rem;
         cursor: pointer;
         transition: 250ms ease;
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         color: #333;
         text-transform: capitalize;
+        text-align: start;
+        padding-inline: 0.5rem;
 
         &:hover {
           background: #e5e5e5;

@@ -8,37 +8,66 @@
     </a>
     <searchbar />
     <div class="account">
-      <a href="/favorites" if={props.user !== null} class="favorites">
-        Favorites (3)
+      <a href="/favorites" if={state.user !== null} class="favorites">
+        Favorites ({state.favoritesCount})
       </a>
-      <p if={props.user !== null} class="account-name">
+      <p if={state.user !== null} class="account-name">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
           <circle cx="12" cy="8" r="4" fill="currentColor"/>
           <path fill="currentColor" fill-opacity="0.25" fill-rule="evenodd" d="M12 13c-3.67 0-6.68 2.42-6.976 5.5c-.026.275.2.5.476.5h13a.465.465 0 0 0 .476-.5C18.68 15.42 15.67 13 12 13" clip-rule="evenodd"/>
         </svg>
-        <span>{props.user.username}</span>
+        <span>{state.user.username}</span>
       </p>
-      <button if={props.user !== null} class="logout" onclick={logout}>
+      <button if={state.user !== null} class="logout" onclick={logout}>
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
           <path fill="currentColor" d="m17 8l-1.41 1.41L17.17 11H9v2h8.17l-1.58 1.58L17 16l4-4zM5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5z"/>
         </svg>
       </button>
-      <a href="/login" class="connexion-button login" if={props.user === null}>
+      <a href="/login" class="connexion-button login" if={state.user === null}>
         Login
       </a>
-      <a href="/register" class="connexion-button register" if={props.user === null}>
+      <a href="/register" class="connexion-button register" if={state.user === null}>
         Sign Up
       </a>
     </div>
   </header>
   <script>
-    import { auth } from "../../utils/firebase";
+    import { auth, db } from "../../utils/firebase";
+    import { getFavorites, listener } from "../../utils/favorites";
+    import { waitUntilAuthReady } from "../../utils/firebase";
 
     export default {
+      state: {
+        favoritesCount: 0,
+        user: null,
+      },
+      async updateFavCount() {
+        const favorites = await getFavorites();
+        this.update({ favoritesCount: favorites.count });
+      },
+      async onMounted() {
+        this.updateFunc = this.updateFavCount.bind(this);
+        listener.addEventListener("update", this.updateFunc);
+
+        this.unsubAuthListener = auth.onAuthStateChanged(async () => {
+          if (auth.currentUser) {
+            const doc = await db.collection("users").doc(auth.currentUser.uid).get();
+            const favorites = await getFavorites();
+
+            this.update({ user: { ...auth.currentUser, ...doc.data() }, favoritesCount: favorites.count });
+          } else {
+            this.update({ user: null, favoritesCount: 0 });
+          }
+        });
+      },
       logout() {
         auth.signOut();
         window.location.reload();
       },
+      onBeforeUnmount() {
+        if (this.updateFunc) listener.removeEventListener("update", this.updateFunc);
+        if (this.unsubAuthListener) this.unsubAuthListener();
+      }
     }
   </script>
 </navbar>

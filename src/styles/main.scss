@@ -101,7 +101,7 @@ a {
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       width: 100%;
       padding: 2.5rem;
-      max-width: calc(80dvw + 2rem);
+      width: calc(80dvw + 2rem);
       gap: 1.5rem;
       height: max-content;
     }
@@ -124,6 +124,7 @@ a {
         width: 100%;
         height: 200px;
         overflow: hidden;
+        position: relative;
 
         .illustration {
           width: 100%;
@@ -131,6 +132,31 @@ a {
           object-fit: cover;
           filter: brightness(0.9);
           transition: 0.3s ease;
+        }
+
+        .type {
+          position: absolute;
+          bottom: 0.5rem;
+          left: 0.5rem;
+          padding: 0.25rem 0.5rem;
+          color: #fff;
+          border-radius: 0.25rem;
+          border: none;
+          font-size: 0.75rem;
+          font-weight: 700;
+          text-transform: capitalize;
+
+          &.master {
+            background: #3fb8af;
+          }
+
+          &.release {
+            background: #ff3d7f;
+          }
+
+          &.artist {
+            background: #f7b32b;
+          }
         }
       }
 
@@ -163,6 +189,10 @@ a {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+
+          &.artist-title {
+            transition: 0.3s transform ease;
+          }
         }
 
         .artist {
@@ -195,8 +225,14 @@ a {
           filter: brightness(1);
         }
 
-        .text-info .year {
-          transform: translateX(0.5rem);
+        .text-info {
+          .year {
+            transform: translateX(0.5rem);
+          }
+
+          .artist-title {
+            transform: translateX(0.5rem);
+          }
         }
       }
     }
@@ -225,6 +261,63 @@ a {
         font-size: 1.25rem;
         color: #666;
         margin-top: 1px;
+      }
+    }
+  }
+
+  &.favorites {
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+
+    .favorites-header {
+      width: calc(80dvw + 2rem - 5rem);
+
+      .favorites-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+
+        .count {
+          font-size: 1.3rem;
+          color: #666;
+          margin-top: 1px;
+        }
+      }
+
+      .no-favorites {
+        font-size: 1.25rem;
+        color: #666;
+        margin-top: 3rem;
+      }
+
+      .selection-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+
+        .selection {
+          padding: 0.5rem 1rem;
+          border: 1px solid #ccc;
+          border-radius: 0.25rem;
+          background: none;
+          color: #333;
+          cursor: pointer;
+          transition: 0.2s ease;
+          text-transform: capitalize;
+
+          &.selected,
+          &:hover {
+            background: #333;
+            border: 1px solid #333;
+            color: #fff;
+          }
+        }
       }
     }
   }

@@ -2,7 +2,14 @@
   <section class="page-content">
     <div if={state.artist === null} class="loader" />
     <div if={state.artist !== null} class="release-container">
-      <illustrations images={state.artist.images} title={state.artist.name} />
+      <div>
+        <illustrations images={state.artist.images} title={state.artist.name} />
+        <div class="community">
+          <div class="like-container">
+            <like releaseId={state.artist.id} liked={state.isFavorite} />
+          </div>
+        </div>
+      </div>
       <div class="info">
         <h2 class="title">{state.artist.name}</h2>
         <p class="members" if={!!state.artist.members?.length}>
@@ -33,10 +40,13 @@
     </div>
     <section class="content artist" if={state.releases !== null}>
       <h2 class="title">Releases <span class="results">({state.pagination.items.toLocaleString("en-US")})</span></h2>
-      <releases releases={state.releases} type="release" />
+      <releases releases={state.releases} />
     </section>
   </section>
   <script>
+    import { waitUntilAuthReady } from "../utils/firebase";
+    import { isFavorite, toggleLike } from "../utils/favorites";
+
     export default {
       state: {
         artist: null,
@@ -45,6 +55,7 @@
         slicedVariations: true,
         seeInactives: false,
         noteExpanded: false,
+        isFavorite: false,
       },
       toggleExpandNotes() {
         this.update({ noteExpanded: !this.state.noteExpanded });
@@ -56,6 +67,7 @@
         this.update({ slicedVariations: !this.state.slicedVariations });
       },
       async onMounted(props) {
+        await waitUntilAuthReady();
         const fetchOptions = {
           headers: {
             Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
@@ -67,8 +79,12 @@
           fetch(`https://api.discogs.com/artists/${props.params.id}/releases`, fetchOptions),
         ]);
 
-        const [artist, { releases, pagination }] = await Promise.all(responses.map((response) => response.json()));
-        this.update({ artist, releases, pagination });
+        const [artist, { releases, pagination }, fav] = await Promise.all([
+          ...responses.map((response) => response.json()),
+          isFavorite(parseInt(props.params.id), "artist"),
+        ]);
+
+        this.update({ artist, releases, pagination, isFavorite: fav });
         console.log(artist);
         console.log(releases);
         console.log(pagination);
@@ -85,7 +101,24 @@
 
           this.$("pre.note").innerHTML = note[0].toUpperCase() + note.slice(1);
         }
+
+        const like = this.$(".like");
+
+        this.likeListener = like.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          like.classList.toggle("liked");
+
+          toggleLike({
+            id: artist.id,
+            thumb: artist.images[0].uri,
+            artist: artist.name,
+          }, "artist");
+        });
       },
+      onBeforeUnmount() {
+        this.$(".like").removeEventListener("click", this.likeListener);
+      }
     }
   </script>
 </artist>

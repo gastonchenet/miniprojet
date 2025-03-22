@@ -81,6 +81,7 @@ export default {
     new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
       template: "src/index.html",
+      favicon: "src/assets/images/favicon.ico",
     }),
     new webpack.HotModuleReplacementPlugin(),
   ],

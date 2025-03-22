@@ -1,3 +1,47 @@
 <favorites>
-  <h1>Favorites</h1>
+  <div class="content favorites">
+    <div if={!state.loaded} class="loader" />
+    <div class="favorites-header" if={state.loaded}>
+      <h1 class="favorites-title">Favorites</h1>
+      <div class="selection-buttons">
+        <button each={key in state.selections} class={state.selected === key ? "selection selected" : "selection"} onclick={() => select(key)}>{key ?? "all"} ({state[key ?? "all"].length})</button>
+      </div>
+      <p if={state[state.selected ?? "all"].length === 0} class="no-favorites">
+        You have no favorites in this category.
+      </p>
+    </div>
+    <releases releases={state["all"]} hideLikeButton={true} if={state.loaded && !state.selected} />
+    <releases releases={state[state.selected]} type={state.selected} hideLikeButton={true} if={state.loaded && state.selected} />
+  </div>
+  <script>
+    import { waitUntilAuthReady } from "../utils/firebase";
+    import { getFavorites } from "../utils/favorites";
+
+    const selections = {
+      All: null,
+      Artist: "artist",
+      Release: "release",
+      Master: "master",
+    }
+
+    export default {
+      state: {
+        release: [],
+        artist: [],
+        master: [],
+        all: [],
+        count: 0,
+        selected: null,
+        selections: Object.values(selections),
+        loaded: false,
+      },
+      select(value) {
+        this.update({ selected: value });
+      },
+      async onMounted() {
+        await waitUntilAuthReady();
+        this.update({ ...await getFavorites(), loaded: true });
+      },
+    }
+  </script>
 </favorites>
