@@ -41,9 +41,11 @@ export default {
     },
   },
   devServer: {
-    hot: true,
     open: true,
     historyApiFallback: true,
+    allowedHosts: "all",
+    port: 3000,
+    host: "0.0.0.0",
   },
   module: {
     rules: [
