@@ -5,7 +5,7 @@
       <div>
         <illustrations images={state.master.images} title={state.master.title} />
         <div class="community">
-          <div class="like-container">
+          <div class="like-container" if={state.loggedIn}>
             <like masterId={state.master.id} liked={state.isFavorite} />
           </div>
         </div>
@@ -49,7 +49,7 @@
   </section>
   <script>
     import { toggleLike, isFavorite } from "../utils/favorites";
-    import { waitUntilAuthReady } from "../utils/firebase";
+    import { waitUntilAuthReady, auth } from "../utils/firebase";
 
     export default {
       state: {
@@ -57,12 +57,15 @@
         rating: null,
         noteExpanded: false,
         isFavorite: false,
+        loggedIn: false,
       },
       toggleExpandNotes() {
         this.update({ noteExpanded: !this.state.noteExpanded });
       },
       async onMounted(props) {
         await waitUntilAuthReady();
+        this.state.loggedIn = !!auth.currentUser;
+
         const fetchOptions = {
           headers: {
             Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",

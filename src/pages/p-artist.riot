@@ -1,11 +1,11 @@
 <artist>
-  <section class="page-content">
+  <section class="page-content" data-page-scroller>
     <div if={state.artist === null} class="loader" />
     <div if={state.artist !== null} class="release-container">
       <div>
-        <illustrations images={state.artist.images} title={state.artist.name} />
+        <illustrations images={state.artist.images} title={state.artist.name} if={(state.artist.images ?? []).length > 0} />
         <div class="community">
-          <div class="like-container">
+          <div class="like-container" if={state.loggedIn}>
             <like releaseId={state.artist.id} liked={state.isFavorite} />
           </div>
         </div>
@@ -17,7 +17,7 @@
           <a class="member inactive" if={state.seeInactives} each={member in state.artist.members.filter((m) => !m.active)} href={`/artist/${member.resource_url.split("/").at(-1)}`}>{member.name.replace(/\([^)]*\)/g, "").trim()}</a>
           <button class="see-options" if={state.artist.members.filter((m) => !m.active).length > 0} onclick={toggleSeeInactives}>{state.seeInactives ? "hide" : `see inactive members (${state.artist.members.filter((m) => !m.active).length})`}</button>
         </p>
-        <p class="variations">
+        <p class="variations" if={(state.artist.namevariations ?? []).length > 0}>
           <span class="variation" each={variation in state.artist.namevariations.slice(0, 5)} if={state.slicedVariations}>{variation}</span>
           <button class="see-options" if={state.slicedVariations && state.artist.namevariations.length > 5} onclick={toggleSlicedVariations}>{" "}(+{state.artist.namevariations.length - 5})</button>
           <span class="variation" each={variation in state.artist.namevariations} if={!state.slicedVariations}>{variation}</span>
@@ -28,7 +28,7 @@
           <pre class={state.noteExpanded ? "note" : "note hidden"} if={!!state.artist.profile}></pre>
           <button class="expand-note" if={!!state.artist.profile && state.artist.profile.split("\n").length > 6} onclick={toggleExpandNotes}>{state.noteExpanded ? "hide" : "show"} note</button>
         </div>
-        <ul class="urls">
+        <ul class="urls" if={(state.artist.urls ?? []).length > 0}>
           <li class="title-url" each={url in state.artist.urls.filter((url) => url.includes("https://"))}>
             <a href={url} target="_tab" class="url">
               <img src={"https://www.google.com/s2/favicons?domain=" + url.match(/https?:\/\/([^/]*)/)[1]} />
@@ -40,12 +40,20 @@
     </div>
     <section class="content artist" if={state.releases !== null}>
       <h2 class="title">Releases <span class="results">({state.pagination.items.toLocaleString("en-US")})</span></h2>
-      <releases releases={state.releases} />
+      <releases releases={state.releases} loadNextPage={loadNextPage} />
     </section>
   </section>
   <script>
-    import { waitUntilAuthReady } from "../utils/firebase";
+    import { waitUntilAuthReady, auth } from "../utils/firebase";
     import { isFavorite, toggleLike } from "../utils/favorites";
+
+    const fetchOptions = {
+      headers: {
+        Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
+      },
+    };
+
+    let currentPage = 1;
 
     export default {
       state: {
@@ -56,6 +64,7 @@
         seeInactives: false,
         noteExpanded: false,
         isFavorite: false,
+        loggedIn: false,
       },
       toggleExpandNotes() {
         this.update({ noteExpanded: !this.state.noteExpanded });
@@ -66,17 +75,27 @@
       toggleSlicedVariations() {
         this.update({ slicedVariations: !this.state.slicedVariations });
       },
+      async loadNextPage(count) {
+        const url = new URL(`https://api.discogs.com/artists/${this.props.params.id}/releases`);
+        url.searchParams.append("page", ++currentPage);
+        url.searchParams.append("per_page", count);
+
+        const res = await fetch(url.toString(), fetchOptions);
+        const data = await res.json();
+
+        return data.releases;
+      },
       async onMounted(props) {
         await waitUntilAuthReady();
-        const fetchOptions = {
-          headers: {
-            Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
-          },
-        };
-        
+        this.state.loggedIn = !!auth.currentUser;
+
+        const releasesUrl = new URL(`https://api.discogs.com/artists/${props.params.id}/releases`);
+        releasesUrl.searchParams.append("page", 1);
+        releasesUrl.searchParams.append("per_page", 50);
+
         const responses = await Promise.all([
           fetch(`https://api.discogs.com/artists/${props.params.id}`, fetchOptions),
-          fetch(`https://api.discogs.com/artists/${props.params.id}/releases`, fetchOptions),
+          fetch(releasesUrl.toString(), fetchOptions),
         ]);
 
         const [artist, { releases, pagination }, fav] = await Promise.all([
@@ -111,7 +130,7 @@
 
           toggleLike({
             id: artist.id,
-            thumb: artist.images[0].uri,
+            thumb: artist.images?.[0].uri,
             artist: artist.name,
           }, "artist");
         });

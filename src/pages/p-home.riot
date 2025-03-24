@@ -1,13 +1,21 @@
 <home>
-  <div class="content">
+  <div class="content" data-page-scroller>
     <div if={state.releases === null} class="loader" />
     <div if={state.releases !== null} class="page-content-container">
       <h2 class="results" if={state.fromSearch}>{state.items.toLocaleString("en-US")} results</h2>
-      <releases releases={state.releases} if={state.releases !== null} type={state.type} />
+      <releases releases={state.releases} if={state.releases !== null} type={state.type} loadNextPage={loadNextPage} />
     </div>
   </div>
   <script>
     import { router, getCurrentRoute } from "@riotjs/route";
+
+    const options = {
+      headers: {
+        Authorization : "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG" 
+      }
+    };
+
+    let currentPage = 1;
 
     export default {
       state: {
@@ -17,25 +25,33 @@
         query: "",
         type: "release",
       },
-      async fill() {
+      async fetchReleases(page, count) {
         const currentUrl = new URL(window.location.href);
         this.state.query = currentUrl.searchParams.get("q") || "";
         this.state.type = currentUrl.searchParams.get("type") || "release";
 
         const url = new URL("https://api.discogs.com/database/search");
-        url.searchParams.append("page", 1);
-        url.searchParams.append("per_page", 50);
+        url.searchParams.append("page", page);
+        url.searchParams.append("per_page", count);
         url.searchParams.append("q", this.state.query);
         url.searchParams.append("type", this.state.type);
 
-        const res = await fetch(url.toString(), {
-          headers: {
-            Authorization : "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG" 
-          }
-        });
-
-        const data = await res.json();
-
+        const res = await fetch(url.toString(), options);
+        return await res.json();
+      },
+      async loadNextPage(count) {
+        const data = await this.fetchReleases(++currentPage, count);
+        return data.results.map((result) => ({
+          id: result.id,
+          title: result.title.split(/\s*-\s*/)[1],
+          artist: result.title.split(/\s*-\s*/)[0],
+          year: result.year,
+          thumb: result.thumb,
+        }));
+      },
+      async fill(page, count) {
+        const data = await this.fetchReleases(page, count);
+        
         this.update({
           releases: data.results.map((result) => ({
             id: result.id,
@@ -52,7 +68,7 @@
         console.log(data);
       },
       onMounted() {
-        this.fill();
+        this.fill(1, 50);
       },
       onUpdated() {
         let url = getCurrentRoute() || window.location.href;
@@ -69,7 +85,7 @@
           currentQuery !== this.state.query ||
           currentType !== this.state.type
         ) {
-          this.fill();
+          this.fill(1, 50);
         }
       }
     }

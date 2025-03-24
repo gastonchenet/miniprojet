@@ -10,7 +10,7 @@
         You have no favorites in this category.
       </p>
     </div>
-    <releases releases={state["all"]} hideLikeButton={true} if={state.loaded && !state.selected} />
+    <releases releases={state.all} hideLikeButton={true} if={state.loaded && !state.selected} />
     <releases releases={state[state.selected]} type={state.selected} hideLikeButton={true} if={state.loaded && state.selected} />
   </div>
   <script>
@@ -31,7 +31,7 @@
         master: [],
         all: [],
         count: 0,
-        selected: null,
+        selected: selections.All,
         selections: Object.values(selections),
         loaded: false,
       },

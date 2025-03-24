@@ -84,6 +84,15 @@ a {
     margin-block: auto;
   }
 
+  .releases-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2.5rem;
+    width: calc(80dvw + 2rem - 5rem);
+  }
+
   .page-content-container .results {
     font-size: 1.25rem;
     font-weight: 700;
@@ -95,6 +104,33 @@ a {
   .releases {
     display: flex;
     flex-direction: column;
+
+    .top-button {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      background: #fff;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: 0.3s ease;
+
+      &.hidden {
+        transform: translateY(3rem);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      &:hover {
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        background: #f0f0f0;
+      }
+    }
 
     .releases-container {
       display: grid;
