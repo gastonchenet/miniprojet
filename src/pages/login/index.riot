@@ -33,7 +33,7 @@
     </form>
   </section>
   <script>
-    import { auth, waitUntilAuthReady } from "../utils/firebase";
+    import { auth, waitUntilAuthReady } from "../../utils/firebase.js";
     import { router } from "@riotjs/route";
 
     export default {
@@ -41,12 +41,14 @@
         passwordVisible: false,
       },
       async onMounted() {
-        await waitUntilAuthReady()
+        await waitUntilAuthReady();
         if (auth.currentUser) router.push("/");
       },
       togglePasswordVisibility() {
         const passwordField = this.$("input[name='password']");
-        passwordField.type = passwordField.type === "password" ? "text" : "password";
+        passwordField.type =
+          passwordField.type === "password" ? "text" : "password";
+
         this.update({ passwordVisible: !this.state.passwordVisible });
       },
       async login(e) {
@@ -60,16 +62,16 @@
         if (!email || !password) {
           return this.update({ error: "Please fill in all fields" });
         }
-        
+
         try {
-          const userCredentials = await auth.signInWithEmailAndPassword(email, password);
+          await auth.signInWithEmailAndPassword(email, password);
           router.push("/");
         } catch (error) {
           this.update({
-            error: error.message.replace(/(Firebase:|\(.*\).?)/g, "").trim()
+            error: error.message.replace(/(Firebase:|\(.*\).?)/g, "").trim(),
           });
         }
       },
-    }
+    };
   </script>
 </login>

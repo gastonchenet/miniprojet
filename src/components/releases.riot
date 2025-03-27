@@ -14,22 +14,23 @@
         <like releaseId={release.id} liked={state.favorites[props.type || release.type].includes(release.id)} />
       </div>
     </button>
-    <div class="releases-loader">
-      <div if={state.loading} class="loader" />
-    </div>
-    <button class="top-button hidden" onclick={returnTop}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-        <path fill="currentColor" fill-rule="evenodd" d="M12 20.75a.75.75 0 0 0 .75-.75v-9.25h-1.5V20c0 .414.336.75.75.75" clip-rule="evenodd" opacity="0.5"/>
-        <path fill="currentColor" d="M6 10.75a.75.75 0 0 1-.53-1.28l6-6a.75.75 0 0 1 1.06 0l6 6a.75.75 0 0 1-.53 1.28z"/>
-      </svg>
-      <span>Return to top</span>
-    </button>
   </div>
+  <div class="releases-loader">
+    <div if={state.loading} class="loader" />
+  </div>
+  <button class="top-button hidden" onclick={returnTop}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+      <path fill="currentColor" fill-rule="evenodd" d="M12 20.75a.75.75 0 0 0 .75-.75v-9.25h-1.5V20c0 .414.336.75.75.75" clip-rule="evenodd" opacity="0.5"/>
+      <path fill="currentColor" d="M6 10.75a.75.75 0 0 1-.53-1.28l6-6a.75.75 0 0 1 1.06 0l6 6a.75.75 0 0 1-.53 1.28z"/>
+    </svg>
+    <span>Return to top</span>
+  </button>
   <script>
-    import placeholder from "../../assets/images/placeholder.png";
     import { router } from "@riotjs/route";
-    import { toggleLike, getFavorites } from "../../utils/favorites";
-    import { waitUntilAuthReady, auth } from "../../utils/firebase";
+    import placeholder from "../assets/images/placeholder.png";
+    import { toggleLike, getFavorites } from "../utils/favorites.js";
+    import { waitUntilAuthReady, auth } from "../utils/firebase.js";
+    import appEvents from "../utils/events.js";
 
     let oldScrollTop = 0;
 
@@ -64,6 +65,10 @@
           this.update({ showLikes: !!auth.currentUser });
         });
 
+        appEvents.on("searchUpdated", (releases) => {
+          this.update({ releases });
+        });
+
         let lastClick = [0, null];
 
         if (this.props.loadNextPage) {
@@ -76,7 +81,8 @@
           artistOnly: (this.state.releases ?? props.releases).every((r) => r.type === "artist"),
         });
 
-        if (!this.props.hideLikeButton) waitUntilAuthReady().then(async () => {
+        if (!this.props.hideLikeButton) {
+          waitUntilAuthReady().then(async () => {
             const favorites = await getFavorites();
 
             this.update({
@@ -87,23 +93,24 @@
               }
             });
           });
+        }
         
         if (this.props.loadNextPage) {
           document.querySelector("[data-page-scroller]")?.addEventListener("scroll", async (e) => {
             const topButton = this.$(".top-button");
 
-            if (e.target.scrollTop > 100 && oldScrollTop <= 100) {
+            if (e.target.scrollTop > window.innerHeight && oldScrollTop <= window.innerHeight) {
               topButton.classList.remove("hidden");  
             }
 
-            if (e.target.scrollTop <= 100 && oldScrollTop > 100) {
+            if (e.target.scrollTop <= window.innerHeight && oldScrollTop > window.innerHeight) {
               topButton.classList.add("hidden");
             }
 
             oldScrollTop = e.target.scrollTop;
 
             if (this.state.loading) return;
-            const atBottom = e.target.scrollTop + 50 >= e.target.scrollTopMax;
+            const atBottom = e.target.scrollTop + 50 >= e.target.scrollHeight - e.target.clientHeight;
             if (!atBottom) return;
             this.update({ loading: true });
 
@@ -172,7 +179,7 @@
       },
       onBeforeUnmount() {
         this.$(".releases-container").removeEventListener("click", this.likeListener);
-      }
+      },
     }
   </script>
 </releases>

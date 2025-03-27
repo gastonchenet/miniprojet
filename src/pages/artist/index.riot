@@ -38,20 +38,16 @@
         </ul>
       </div>
     </div>
-    <section class="content artist" if={state.releases !== null}>
+    <div class="content artist" if={state.releases !== null}>
       <h2 class="title">Releases <span class="results">({state.pagination.items.toLocaleString("en-US")})</span></h2>
       <releases releases={state.releases} loadNextPage={loadNextPage} />
-    </section>
+    </div>
   </section>
   <script>
-    import { waitUntilAuthReady, auth } from "../utils/firebase";
-    import { isFavorite, toggleLike } from "../utils/favorites";
-
-    const fetchOptions = {
-      headers: {
-        Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
-      },
-    };
+    import { waitUntilAuthReady, auth } from "../../utils/firebase.js";
+    import { isFavorite, toggleLike } from "../../utils/favorites.js";
+    import { fetchArtist, fetchArtistReleases } from "../../utils/api.js";
+    import formatProfile from "./formatProfile.js";
 
     let currentPage = 1;
 
@@ -76,68 +72,50 @@
         this.update({ slicedVariations: !this.state.slicedVariations });
       },
       async loadNextPage(count) {
-        const url = new URL(`https://api.discogs.com/artists/${this.props.params.id}/releases`);
-        url.searchParams.append("page", ++currentPage);
-        url.searchParams.append("per_page", count);
-
-        const res = await fetch(url.toString(), fetchOptions);
-        const data = await res.json();
-
-        return data.releases;
+        const { releases } = await fetchArtistReleases(this.props.params.id, ++currentPage, count);
+        return releases;
       },
-      async onMounted(props) {
-        await waitUntilAuthReady();
-        this.state.loggedIn = !!auth.currentUser;
-
-        const releasesUrl = new URL(`https://api.discogs.com/artists/${props.params.id}/releases`);
-        releasesUrl.searchParams.append("page", 1);
-        releasesUrl.searchParams.append("per_page", 50);
-
-        const responses = await Promise.all([
-          fetch(`https://api.discogs.com/artists/${props.params.id}`, fetchOptions),
-          fetch(releasesUrl.toString(), fetchOptions),
-        ]);
-
-        const [artist, { releases, pagination }, fav] = await Promise.all([
-          ...responses.map((response) => response.json()),
-          isFavorite(parseInt(props.params.id), "artist"),
-        ]);
-
+      async fill(artistId) {
+        const { artist, releases, pagination, fav } = await fetchArtist(artistId);
         this.update({ artist, releases, pagination, isFavorite: fav });
+
         console.log(artist);
         console.log(releases);
         console.log(pagination);
 
         if (artist.profile) {
-          const note = artist.profile
-          .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (match, url, text) => {
-            if (url.startsWith("http")) return text;
-            return `<a href='${url}' class='link'>${text}</a>`;
-          })
-          .replace(/\[r=([^\]]*)\]/g, "<a href='/release/$1' class='link'>here</a>")
-          .replace(/\[[^\]]*\]/g, "")
-          .trim();
-
-          this.$("pre.note").innerHTML = note[0].toUpperCase() + note.slice(1);
+          this.$("pre.note").innerHTML = formatProfile(artist.profile);
         }
 
         const like = this.$(".like");
 
-        this.likeListener = like.addEventListener("click", (e) => {
+        this.likeListener = like?.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
           like.classList.toggle("liked");
 
-          toggleLike({
-            id: artist.id,
-            thumb: artist.images?.[0].uri,
-            artist: artist.name,
-          }, "artist");
+          toggleLike(
+            {
+              id: artist.id,
+              thumb: artist.images?.[0].uri,
+              artist: artist.name,
+            },
+            "artist"
+          );
         });
+      },
+      async onMounted(props) {
+        this.state.loggedIn = await waitUntilAuthReady();
+        this.fill(props.params.id);
       },
       onBeforeUnmount() {
         this.$(".like").removeEventListener("click", this.likeListener);
+      },
+      onUpdated(props) {
+        if (this.state.artist && this.props.params.id !== props.params.id) {
+          this.fill(props.params.id);
+        }
       }
-    }
+    };
   </script>
 </artist>

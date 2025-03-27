@@ -1,5 +1,7 @@
 import { db, auth } from "./firebase.js";
 import { arrayUnion, arrayRemove } from "firebase/firestore";
+import observable from "@riotjs/observable";
+import appEvents from "./events.js";
 
 const fieldMap = {
   release: "favoriteReleases",
@@ -19,8 +21,6 @@ let favoritesCache = {
     return this.release.length + this.artist.length + this.master.length;
   },
 };
-
-export const listener = new EventTarget();
 
 export async function getFavorites() {
   if (favoritesCache.filled) {
@@ -127,5 +127,5 @@ export async function toggleLike(favorite, type) {
     console.error("Error updating favorites:", error);
   }
 
-  listener.dispatchEvent(new Event("update"));
+  appEvents.trigger("favoritesUpdated");
 }

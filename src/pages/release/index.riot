@@ -61,8 +61,10 @@
     </div>
   </section>
   <script>
-    import { toggleLike, isFavorite } from "../utils/favorites";
-    import { waitUntilAuthReady, auth } from "../utils/firebase";
+    import { toggleLike, isFavorite } from "../../utils/favorites.js";
+    import { waitUntilAuthReady, auth } from "../../utils/firebase.js";
+    import { fetchRelease } from "../../utils/api.js";
+    import appEvents from "../../utils/events.js";
 
     export default {
       state: {
@@ -76,62 +78,61 @@
         this.update({ noteExpanded: !this.state.noteExpanded });
       },
       async onMounted(props) {
-        await waitUntilAuthReady();
-        this.state.loggedIn = !!auth.currentUser;
+        this.state.loggedIn = await waitUntilAuthReady();
 
-        const fetchOptions = {
-          headers: {
-            Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
-          },
-        };
-        
-        const responses = await Promise.all([
-          fetch(`https://api.discogs.com/releases/${props.params.id}`, fetchOptions),
-          fetch(`https://api.discogs.com/releases/${props.params.id}/rating`, fetchOptions),
-        ]);
-
-        const [release, stats, fav] = await Promise.all([
-          ...responses.map((response) => response.json()),
-          isFavorite(parseInt(props.params.id), "release"),
-        ]);
+        const { release, stats, fav } = await fetchRelease(props.params.id);
 
         console.log(release);
         console.log(stats);
         console.log(fav);
-        this.update({ release, rating: stats.rating, selectedImage: release.images[0].uri, isFavorite: fav });
+
+        this.update({
+          release,
+          rating: stats.rating,
+          selectedImage: release.images[0].uri,
+          isFavorite: fav,
+        });
 
         if (release.notes) {
           const note = release.notes
-          .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (match, url, text) => {
-            if (url.startsWith("http")) return text;
-            return `<a href='${url}' class='link'>${text}</a>`;
-          })
-          .replace(/\[r=([^\]]*)\]/g, "<a href='/release/$1' class='link'>here</a>")
-          .replace(/\[[^\]]*\]/g, "")
-          .trim();
+            .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (_, url, text) => {
+              if (url.startsWith("http")) return text;
+              return `<a href='${url}' class='link'>${text}</a>`;
+            })
+            .replace(
+              /\[r=([^\]]*)\]/g,
+              "<a href='/release/$1' class='link'>here</a>"
+            )
+            .replace(/\[[^\]]*\]/g, "")
+            .trim();
 
           this.$("pre.note").innerHTML = note[0].toUpperCase() + note.slice(1);
         }
 
         const like = this.$(".like");
 
-        this.likeListener = like.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          like.classList.toggle("liked");
+        if (like) {
+          this.likeListener = like.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            like.classList.toggle("liked");
 
-          toggleLike({
-            id: release.id,
-            title: release.title,
-            thumb: release.thumb,
-            artist: release.artists[0].name,
-            year: release.year,
-          }, "release");
-        });
+            toggleLike(
+              {
+                id: release.id,
+                title: release.title,
+                thumb: release.thumb,
+                artist: release.artists[0].name,
+                year: release.year,
+              },
+              "release"
+            );
+          });
+        }
       },
       onBeforeUnmount() {
-        this.$(".like").removeEventListener("click", this.likeListener);
-      }
-    }
+        if (this.likeListener) this.$(".like").removeEventListener("click", this.likeListener);
+      },
+    };
   </script>
 </release>

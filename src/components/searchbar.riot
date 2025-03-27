@@ -22,6 +22,7 @@
   </form>
   <script>
     import { router } from "@riotjs/route";
+    import appEvents from "../utils/events.js"
 
     const selections = {
       Artist: "artist",
@@ -49,6 +50,7 @@
         const type = this.state.type;
 
         router.push(`/?q=${query}&type=${type}`);
+        appEvents.trigger("search", { query, type });
       },
       onMounted() {
         const url = new URL(window.location.href);
@@ -57,6 +59,22 @@
           query: url.searchParams.get("q") || "",
           type: url.searchParams.get("type") || selections.Release,
         });
+
+        this.searchbarUpdateFunction = ((path) => {
+          if (!path.startsWith("http")) {
+            path = window.location.origin + path;
+          }
+
+          const url = new URL(path);
+          let val = url.searchParams.get("q") || "";
+          if (url.pathname !== "/") val = "";
+          this.$(".search-field").value = val;
+        }).bind(this);
+
+        router.on.value(this.searchbarUpdateFunction);
+      },
+      onBeforeUnmount() {
+        router.off.value(this.searchbarUpdateFunction);
       }
     }
   </script>

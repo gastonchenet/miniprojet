@@ -12,14 +12,14 @@
     import { Router, Route, route, toRegexp, match, setBase } from "@riotjs/route";
     import { auth, db, waitUntilAuthReady } from "./utils/firebase";
     import pages from "./pages";
-    import Home from "./pages/p-home.riot";
-    import Favorites from "./pages/p-favorites.riot";
-    import Login from "./pages/p-login.riot";
-    import Register from "./pages/p-register.riot";
-    import Release from "./pages/p-release.riot";
-    import Master from "./pages/p-master.riot";
-    import Artist from "./pages/p-artist.riot";
-    import NotFound from "./pages/p-not-found.riot";
+
+    import Home from "./pages/home/index.riot";
+    import Favorites from "./pages/favorites/index.riot";
+    import Login from "./pages/login/index.riot";
+    import Register from "./pages/register/index.riot";
+    import Release from "./pages/release/index.riot";
+    import Master from "./pages/master/index.riot";
+    import Artist from "./pages/artist/index.riot";
 
     export default {
       components: {
@@ -29,10 +29,9 @@
         Favorites,
         Login,
         Register,
-        Master,
         Release,
+        Master,
         Artist,
-        NotFound,
       },
       state: {
         pages,
@@ -41,11 +40,8 @@
       onMounted(props, state) {
         setBase("/");
 
-        this.anyRouteStream = route("(.*)")
-        
-        this.anyRouteStream.on.value((path) => {
-          this.update();   
-        });
+        this.anyRouteStream = route("(.*)");
+        this.anyRouteStream.on.value((path) => this.update());
       },
       onUnmounted() {
         this.anyRouteStream.end();

@@ -14,15 +14,15 @@
     <releases releases={state[state.selected]} type={state.selected} hideLikeButton={true} if={state.loaded && state.selected} />
   </div>
   <script>
-    import { waitUntilAuthReady } from "../utils/firebase";
-    import { getFavorites } from "../utils/favorites";
+    import { waitUntilAuthReady } from "../../utils/firebase.js";
+    import { getFavorites } from "../../utils/favorites.js";
 
     const selections = {
       All: null,
       Artist: "artist",
       Release: "release",
       Master: "master",
-    }
+    };
 
     export default {
       state: {
@@ -40,8 +40,8 @@
       },
       async onMounted() {
         await waitUntilAuthReady();
-        this.update({ ...await getFavorites(), loaded: true });
+        this.update({ ...(await getFavorites()), loaded: true });
       },
-    }
+    };
   </script>
 </favorites>

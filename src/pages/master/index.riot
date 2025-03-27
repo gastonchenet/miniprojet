@@ -48,8 +48,9 @@
     </div>
   </section>
   <script>
-    import { toggleLike, isFavorite } from "../utils/favorites";
-    import { waitUntilAuthReady, auth } from "../utils/firebase";
+    import { toggleLike, isFavorite } from "../../utils/favorites.js";
+    import { waitUntilAuthReady, auth } from "../../utils/firebase.js";
+    import { fetchMaster } from "../../utils/api.js";
 
     export default {
       state: {
@@ -63,35 +64,31 @@
         this.update({ noteExpanded: !this.state.noteExpanded });
       },
       async onMounted(props) {
-        await waitUntilAuthReady();
-        this.state.loggedIn = !!auth.currentUser;
+        this.state.loggedIn = await waitUntilAuthReady();
 
-        const fetchOptions = {
-          headers: {
-            Authorization: "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
-          },
-        };
-        
-        const res = await fetch(`https://api.discogs.com/masters/${props.params.id}`, fetchOptions);
-
-        const [master, fav] = await Promise.all([
-          res.json(),
-          isFavorite(parseInt(props.params.id), "master"),
-        ]);
+        const { master, fav } = await fetchMaster(props.params.id);
 
         console.log(master);
         console.log(fav);
-        this.update({ master, selectedImage: master.images[0].uri, isFavorite: fav });
+
+        this.update({
+          master,
+          selectedImage: master.images[0].uri,
+          isFavorite: fav,
+        });
 
         if (master.notes) {
           const note = master.notes
-          .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (match, url, text) => {
-            if (url.startsWith("http")) return text;
-            return `<a href='${url}' class='link'>${text}</a>`;
-          })
-          .replace(/\[r=([^\]]*)\]/g, "<a href='/master/$1' class='link'>here</a>")
-          .replace(/\[[^\]]*\]/g, "")
-          .trim();
+            .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (match, url, text) => {
+              if (url.startsWith("http")) return text;
+              return `<a href='${url}' class='link'>${text}</a>`;
+            })
+            .replace(
+              /\[r=([^\]]*)\]/g,
+              "<a href='/master/$1' class='link'>here</a>"
+            )
+            .replace(/\[[^\]]*\]/g, "")
+            .trim();
 
           this.$("pre.note").innerHTML = note[0].toUpperCase() + note.slice(1);
         }
@@ -103,18 +100,21 @@
           e.stopPropagation();
           like.classList.toggle("liked");
 
-          toggleLike({
-            id: master.id,
-            title: master.title,
-            thumb: master.images[0].uri,
-            artist: master.artists[0].name,
-            year: master.year,
-          }, "master");
+          toggleLike(
+            {
+              id: master.id,
+              title: master.title,
+              thumb: master.images[0].uri,
+              artist: master.artists[0].name,
+              year: master.year,
+            },
+            "master"
+          );
         });
       },
       onBeforeUnmount() {
         this.$(".like").removeEventListener("click", this.likeListener);
-      }
-    }
+      },
+    };
   </script>
 </master>

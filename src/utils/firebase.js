@@ -15,7 +15,7 @@ export async function waitUntilAuthReady() {
   return new Promise((resolve) => {
     const unsubscribe = auth.onAuthStateChanged(() => {
       unsubscribe();
-      resolve();
+      resolve(!!auth.currentUser);
     });
   });
 }

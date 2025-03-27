@@ -21,7 +21,7 @@
         const selectionsContainer = this.$(".selections-container");
         let lastScroll = 0;
 
-        selectionsContainer.addEventListener("wheel", (e) => {
+        this.scrollListener = selectionsContainer.addEventListener("wheel", (e) => {
           e.preventDefault();
 
           if (Date.now() - lastScroll < 250) return;
@@ -32,7 +32,10 @@
             behavior: "smooth",
           });
         });
-      }
+      },
+      onBeforeUnmount() {
+        this.$(".selections-container").removeEventListener("wheel", this.scrollListener);
+      },
     }
   </script>
 </illustrations>

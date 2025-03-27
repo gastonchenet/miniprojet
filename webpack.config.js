@@ -1,6 +1,6 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import webpack from "webpack";
+import WebpackBundleAnalyzer from "webpack-bundle-analyzer";
 import path from "node:path";
 
 export default {
@@ -85,6 +85,9 @@ export default {
       template: "src/index.html",
       favicon: "src/assets/images/favicon.ico",
     }),
-    new webpack.HotModuleReplacementPlugin(),
+    new WebpackBundleAnalyzer.BundleAnalyzerPlugin({
+      analyzerMode: "static",
+      openAnalyzer: false,
+    }),
   ],
 };
