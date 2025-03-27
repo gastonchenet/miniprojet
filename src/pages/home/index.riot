@@ -1,7 +1,7 @@
 <home>
   <div class="content" data-page-scroller>
-    <div if={state.releases === null} class="loader" />
-    <div if={state.releases !== null} class="page-content-container">
+    <div if={state.updating} class="loader" />
+    <div if={!state.updating && state.releases !== null} class="page-content-container">
       <h2 class="results" if={state.fromSearch}>{state.items.toLocaleString("en-US")} results</h2>
       <releases releases={state.releases} if={state.releases !== null} type={state.type} loadNextPage={loadNextPage} />
     </div>
@@ -21,6 +21,7 @@
         fromSearch: false,
         query: "",
         type: "release",
+        updating: true,
       },
       getSearchParams() {
         const url = new URL(window.location.href);
@@ -36,6 +37,7 @@
       },
       async fill(page, searchData = {}) {
         const { query, type } = this.getSearchParams();
+        this.update({ updating: true });
         const data = await search(searchData.query ?? query, searchData.type ?? type, page);
         const releases = search.util.formatResults(data.results);
 

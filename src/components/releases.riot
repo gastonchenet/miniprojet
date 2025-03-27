@@ -99,11 +99,11 @@
           document.querySelector("[data-page-scroller]")?.addEventListener("scroll", async (e) => {
             const topButton = this.$(".top-button");
 
-            if (e.target.scrollTop > window.innerHeight && oldScrollTop <= window.innerHeight) {
+            if (topButton && e.target.scrollTop > window.innerHeight && oldScrollTop <= window.innerHeight) {
               topButton.classList.remove("hidden");  
             }
 
-            if (e.target.scrollTop <= window.innerHeight && oldScrollTop > window.innerHeight) {
+            if (topButton && e.target.scrollTop <= window.innerHeight && oldScrollTop > window.innerHeight) {
               topButton.classList.add("hidden");
             }
 
