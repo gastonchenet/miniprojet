@@ -12,6 +12,7 @@
     </div>
     <releases releases={state.all} hideLikeButton={true} if={state.loaded && !state.selected} />
     <releases releases={state[state.selected]} type={state.selected} hideLikeButton={true} if={state.loaded && state.selected} />
+    <c-footer title={props.title} />
   </div>
   <script>
     import { waitUntilAuthReady } from "../../utils/firebase.js";

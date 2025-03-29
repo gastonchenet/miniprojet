@@ -20,6 +20,7 @@
       spellcheck="false"
       value={state.query}
       oninput={onSearchInput}
+      onclick={onSearchInput}
     />
     <button type="submit" class="search-button">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -27,7 +28,7 @@
       </svg>    
     </button>
     <div class="preview-results">
-      <a each={result in state.preview} class="preview" href={`/${state.type}/${result.id}`}>
+      <a each={result in state.preview} class="preview" href={`/${state.type}/${result.id}`} onclick={emptyPreview}>
         <img src={result.thumb || placeholder} class="illustration" alt={result.title} />
         <div class="info">
           <h4 class="title">{result.title || result.artist}</h4>
@@ -51,7 +52,6 @@
         searchOptions: Object.values(ItemType),
         query: "",
         preview: [],
-        fetching: false,
       },
       placeholder,
       select(option) {
@@ -61,26 +61,30 @@
       toggleMenu() {
         this.$(".menu").classList.toggle("visible");
       },
+      emptyPreview() {
+        this.update({ preview: [] });
+        document.querySelector(".content-blur")?.classList.remove("visible");
+      },
       async updatePreview(query = "") {
-        this.update({ fetching: true });
         const { results } = await search(query, this.state.type, 1, 10);
-        this.update({ preview: search.util.formatResults(results), fetching: false });
+        if (!this.$(".search-field").value || document.activeElement !== this.$(".search-field")) return this.emptyPreview();
+        if (results.length > 0) document.querySelector(".content-blur")?.classList.add("visible");
+        this.update({ preview: search.util.formatResults(results) });
       },
       onSearchInput(e) {
-        if (!e.target.value) {
-          this.update({ preview: [] });
-          return;
-        }
-
+        if (!e.target.value) return this.emptyPreview();
         lastTyped = Date.now();
 
         setTimeout(() => {
+          if (!e.target.value) return this.emptyPreview();
           if (Date.now() - lastTyped < 500) return;
           this.updatePreview(e.target.value);
         }, 500);
       },
       search(e) {
         e.preventDefault();
+        this.emptyPreview();
+        this.$(".search-field").blur();
 
         const query = this.$(".search-field").value;
         const type = this.state.type;
@@ -96,6 +100,8 @@
           type: url.searchParams.get("type") || ItemType.Release,
         });
 
+        this.blurListener = (() => this.emptyPreview()).bind(this);
+
         this.searchbarUpdateFunction = ((path) => {
           if (!path.startsWith("http")) {
             path = window.location.origin + path;
@@ -107,17 +113,20 @@
           this.$(".search-field").value = val;
         }).bind(this);
 
-        router.on.value(this.searchbarUpdateFunction);
-
-        this.menuClickListener = window.addEventListener("click", (e) => {
+        this.menuClickListener = ((e) => {
           if (!e.target.closest(".menu-button")) {
             this.$(".menu")?.classList.remove("visible");
           }
-        })
+        }).bind(this);
+        
+        router.on.value(this.searchbarUpdateFunction);
+        window.addEventListener("click", this.menuClickListener);
+        document.querySelector(".content-blur")?.addEventListener("click", this.blurListener);
       },
       onBeforeUnmount() {
         router.off.value(this.searchbarUpdateFunction);
         window.removeEventListener("click", this.menuClickListener);
+        document.querySelector(".content-blur")?.removeEventListener("click", this.blurListener);
       }
     }
   </script>

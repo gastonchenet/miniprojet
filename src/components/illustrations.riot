@@ -19,9 +19,10 @@
         this.selectImage(this.props.images[0].uri);
 
         const selectionsContainer = this.$(".selections-container");
+        if (!selectionsContainer) return;
         let lastScroll = 0;
 
-        this.scrollListener = selectionsContainer.addEventListener("wheel", (e) => {
+        this.scrollListener = ((e) => {
           e.preventDefault();
 
           if (Date.now() - lastScroll < 250) return;
@@ -31,10 +32,12 @@
             left: selectionsContainer.scrollLeft + e.deltaY,
             behavior: "smooth",
           });
-        });
+        }).bind(this);
+        
+        selectionsContainer.addEventListener("wheel", this.scrollListener);
       },
       onBeforeUnmount() {
-        this.$(".selections-container").removeEventListener("wheel", this.scrollListener);
+        this.$(".selections-container")?.removeEventListener("wheel", this.scrollListener);
       },
     }
   </script>

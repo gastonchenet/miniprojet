@@ -1,0 +1,70 @@
+.footer {
+  background: #444;
+  padding: 4rem 11dvw;
+  width: 100%;
+  color: #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+
+  .icon {
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+
+  .description {
+    font-size: 1rem;
+    color: #bbb;
+    margin-bottom: 1rem;
+    max-width: 22dvw;
+    line-height: 1.5;
+  }
+
+  .copyright {
+    font-size: 0.875rem;
+    color: #999;
+    margin-bottom: 1rem;
+    max-width: 250px;
+    line-height: 1.5;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 8dvw;
+
+    .category {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .title {
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        color: #fff;
+      }
+
+      .link {
+        font-size: 1rem;
+        color: #bbb;
+        margin-bottom: 0.5rem;
+        text-decoration: none;
+        transition: 0.2s ease;
+        cursor: pointer;
+
+        &:hover {
+          color: #fff;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}

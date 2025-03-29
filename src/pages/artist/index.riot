@@ -84,38 +84,39 @@
         console.log(releases);
         console.log(pagination);
 
-        if (artist.profile) {
-          this.$("pre.note").innerHTML = formatProfile(artist.profile);
-        }
+        if (artist.profile && this.$("pre.note")) this.$("pre.note").innerHTML = formatProfile(artist.profile);
 
         const like = this.$(".like");
 
-        this.likeListener = like?.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          like.classList.toggle("liked");
+        if (like) {
+          this.likeListener = ((e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            like.classList.toggle("liked");
 
-          toggleLike(
-            {
-              id: artist.id,
-              thumb: artist.images?.[0].uri,
-              artist: artist.name,
-            },
-            ItemType.Artist
-          );
-        });
+            toggleLike(
+              {
+                id: artist.id,
+                thumb: artist.images?.[0].uri,
+                artist: artist.name,
+              },
+              ItemType.Artist
+            );
+          }).bind(this);
+          
+          like?.addEventListener("click", this.likeListener);
+        }
       },
       async onMounted(props) {
         this.state.loggedIn = await waitUntilAuthReady();
         this.fill(props.params.id);
       },
       onBeforeUnmount() {
-        this.$(".like").removeEventListener("click", this.likeListener);
+        if (this.likeListener) this.$(".like").removeEventListener("click", this.likeListener);
       },
       onUpdated(props) {
-        if (this.state.artist && this.props.params.id !== props.params.id) {
-          this.fill(props.params.id);
-        }
+        if (!this.state.artist || this.props.params.id === props.params.id) return;
+        this.fill(props.params.id);
       }
     };
   </script>

@@ -46,6 +46,7 @@
         </div>
       </div>
     </div>
+    <c-footer title={props.title} />
   </section>
   <script>
     import { toggleLike, isFavorite } from "../../utils/favorites.js";
@@ -79,11 +80,11 @@
           isFavorite: fav,
         });
 
-        if (master.notes) this.$("pre.note").innerHTML = formatNote(master.notes);
+        if (master.notes && this.$("pre.note")) this.$("pre.note").innerHTML = formatNote(master.notes);
 
         const like = this.$(".like");
 
-        this.likeListener = like?.addEventListener("click", (e) => {
+        this.likeListener = ((e) => {
           e.preventDefault();
           e.stopPropagation();
           like.classList.toggle("liked");
@@ -98,7 +99,9 @@
             },
             ItemType.Master
           );
-        });
+        }).bind(this);
+
+        like?.addEventListener("click", this.likeListener);
       },
       onBeforeUnmount() {
         this.$(".like")?.removeEventListener("click", this.likeListener);

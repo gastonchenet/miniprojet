@@ -26,7 +26,7 @@ search.util = {
       title: result.title.split(/\s*-\s*/)[1],
       artist: result.title.split(/\s*-\s*/)[0],
       year: result.year ? parseInt(result.year) : undefined,
-      thumb: result.thumb,
+      thumb: result.thumb ? result.cover_image : undefined,
     }));
   },
 };

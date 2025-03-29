@@ -3,37 +3,20 @@
     <navbar title={props.title} />
     <router>
       <route each={page in state.pages} path={page.path}>
-        <main is={page.componentName} params={route.params} />
-        <not-found if={state.showNotFound} />
+        <main is={page.componentName} params={route.params} title={props.title} />
       </route>
     </router>
+    <main is="not-found" if={state.showNotFound} />
   </div>
   <script>
     import { Router, Route, route, router, toRegexp, match, setBase } from "@riotjs/route";
     import { auth, db, waitUntilAuthReady } from "./utils/firebase";
     import pages from "./pages";
 
-    import Home from "./pages/home/index.riot";
-    import Favorites from "./pages/favorites/index.riot";
-    import Login from "./pages/login/index.riot";
-    import Register from "./pages/register/index.riot";
-    import Release from "./pages/release/index.riot";
-    import Master from "./pages/master/index.riot";
-    import Artist from "./pages/artist/index.riot";
-    import NotFound from "./pages/not-found/index.riot";
-
     export default {
       components: {
         Router,
         Route,
-        Home,
-        Favorites,
-        Login,
-        Register,
-        Release,
-        Master,
-        Artist,
-        NotFound,
       },
       state: {
         pages,
@@ -41,14 +24,15 @@
       },
       onMounted(props, state) {
         router.on.value((path) => {
-          console.log(this.state.pages.map((p) => new RegExp(p.path.replace(/:[a-z0-9A-Z_-]+/g, "([a-z0-9A-Z_-]+)") + "$").test(path.replace(window.location.origin, ""))));
-
           this.update({
-            showNotFound: !this.state.pages.some((p) => this.state.pages.map((p) => new RegExp(p.path.replace(/:[a-z0-9A-Z_-]+/g, "([a-z0-9A-Z_-]+)") + "$").test(path.replace(window.location.origin, ""))))
+            showNotFound: !this.state.pages.some((p) =>
+              new RegExp(
+                p.path.replace(/:[a-z0-9A-Z_-]+/g, "([a-z0-9A-Z_-]+)") + "$")
+                  .test(path.replace(window.location.origin, "")
+              )
+            ),
           });
         });
-      },
-      onUnmounted() {
       },
     }
   </script>

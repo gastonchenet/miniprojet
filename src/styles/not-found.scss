@@ -1,56 +1,61 @@
-.main-container {
-  flex-direction: column;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(100vh - 60px);
-  padding-bottom: 5rem;
+.not-found-container {
+  height: calc(100dvh - 60px);
+  overflow-y: scroll;
 
-  .not-found-title {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 1rem;
-  }
-
-  .not-found-text {
-    font-size: 1.125rem;
-    color: #666;
-    margin-bottom: 1rem;
-  }
-
-  .actions {
+  .main-container {
+    flex-direction: column;
     display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
+    justify-content: center;
+    align-items: center;
+    height: calc(100dvh - 60px);
+    padding-bottom: 5rem;
 
-    .action-button {
-      padding: 0.5rem 1rem;
-      border: 1px solid #ccc;
-      border-radius: 0.25rem;
-      background: none;
+    .not-found-title {
+      font-size: 3rem;
+      font-weight: 700;
       color: #333;
-      cursor: pointer;
-      transition: 0.2s ease;
-      text-decoration: none;
+      margin-bottom: 1rem;
+    }
+
+    .not-found-text {
+      font-size: 1.125rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+
+    .actions {
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
+      gap: 1rem;
+      margin-top: 1rem;
 
-      &.selected,
-      &:hover {
-        background: #333;
-        border: 1px solid #333;
-        color: #fff;
-      }
+      .action-button {
+        padding: 0.5rem 1rem;
+        border: 1px solid #ccc;
+        border-radius: 0.25rem;
+        background: none;
+        color: #333;
+        cursor: pointer;
+        transition: 0.2s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
 
-      &.back {
-        .icon {
-          transition: 0.2s ease;
+        &.selected,
+        &:hover {
+          background: #333;
+          border: 1px solid #333;
+          color: #fff;
         }
 
-        &:hover .icon {
-          transform: translateX(-0.25rem);
+        &.back {
+          .icon {
+            transition: 0.2s ease;
+          }
+
+          &:hover .icon {
+            transform: translateX(-0.25rem);
+          }
         }
       }
     }

@@ -23,10 +23,15 @@
         type: ItemType.Release,
         updating: true,
       },
-      getSearchParams() {
+      getSearchParams(searchData) {
         const url = new URL(window.location.href);
-        const query = url.searchParams.get("q") || "";
-        const type = url.searchParams.get("type") || ItemType.Release;
+        let query = url.searchParams.get("q") || "";
+        let type = url.searchParams.get("type") || ItemType.Release;
+
+        if (searchData) {
+          query = searchData.query;
+          type = searchData.type;
+        }
 
         this.update({ query, type, fromSearch: !!query });
 
@@ -37,13 +42,13 @@
         const data = await search(query, type, ++currentPage, count);
         return search.util.formatResults(data.results);
       },
-      async fill(page, searchData = {}) {
-        const { query, type } = this.getSearchParams();
+      async fill(page, searchData) {
+        const { query, type } = this.getSearchParams(searchData);
         this.update({ updating: true });
-        const data = await search(searchData.query ?? query, searchData.type ?? type, page);
+        const data = await search(query, type, page);
         const releases = search.util.formatResults(data.results);
 
-        if (Object.keys(searchData).length) {
+        if (searchData && Object.keys(searchData).length) {
           appEvents.trigger("searchUpdated", releases);
         }
 
@@ -60,7 +65,11 @@
       },
       onMounted() {
         this.fill(1);
-        appEvents.on("search", (searchData) => this.fill(1, searchData));
+        this.updateSearch = ((searchData) => this.fill(1, searchData)).bind(this);
+        appEvents.on("search", this.updateSearch);
+      },
+      onUnmounted() {
+        appEvents.off("search", this.updateSearch);
       },
     };
   </script>

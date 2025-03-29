@@ -9,7 +9,10 @@
     <searchbar />
     <div class="account">
       <a href="/favorites" if={state.user !== null} class="favorites">
-        Favorites ({state.favoritesCount})
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48" class="star filled">
+          <path fill="currentColor" stroke="currentColor" stroke-linejoin="round" stroke-width="4" d="m23.999 5l-6.113 12.478L4 19.49l10.059 9.834L11.654 43L24 36.42L36.345 43L33.96 29.325L44 19.491l-13.809-2.013z"/>
+        </svg>
+        <span>Favorites ({state.favoritesCount})</span>
       </a>
       <p if={state.user !== null} class="account-name">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -31,6 +34,7 @@
       </a>
     </div>
   </header>
+  <div class="content-blur" />
   <script>
     import { auth, db } from "../utils/firebase";
     import { getFavorites } from "../utils/favorites";
@@ -46,12 +50,12 @@
       gotoHome() {
         appEvents.trigger("search", { query: "", type: ItemType.Release });
       },
-      async updateFavCount() {
-        const favorites = await getFavorites();
-        this.update({ favoritesCount: favorites.count });
-      },
       async onMounted() {
-        this.updateFunc = this.updateFavCount.bind(this);
+        this.updateFunc = (async () => {
+          const favorites = await getFavorites();
+          this.update({ favoritesCount: favorites.count });
+        }).bind(this);
+
         appEvents.on("favoritesUpdated", this.updateFunc);
 
         this.unsubAuthListener = auth.onAuthStateChanged(async () => {
@@ -70,8 +74,8 @@
         window.location.reload();
       },
       onBeforeUnmount() {
-        if (this.updateFunc) appEvents.off("favoritesUpdated", this.updateFunc);
-        if (this.unsubAuthListener) this.unsubAuthListener();
+        appEvents.off("favoritesUpdated", this.updateFunc);
+        this.unsubAuthListener();
       }
     }
   </script>

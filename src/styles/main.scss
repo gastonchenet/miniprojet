@@ -120,13 +120,14 @@ a {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.25rem 0.5rem;
+      padding: 0.5rem 0.75rem;
       border-radius: 0.25rem;
-      background: #fff;
-      border: 1px solid #ccc;
+      background: #222;
+      color: #fff;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       cursor: pointer;
       transition: 0.3s ease;
+      border: none;
 
       &.hidden {
         transform: translateY(3rem);
@@ -136,7 +137,7 @@ a {
 
       &:hover {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        background: #f0f0f0;
+        background: #333;
       }
     }
 
@@ -189,6 +190,8 @@ a {
           font-size: 0.75rem;
           font-weight: 700;
           text-transform: capitalize;
+          opacity: 0.8;
+          transition: 0.3s ease;
 
           &.master {
             background: #3fb8af;
@@ -267,6 +270,10 @@ a {
         .illustration {
           transform: scale(1.1) rotate(2deg);
           filter: brightness(1);
+        }
+
+        .type {
+          opacity: 1;
         }
 
         .text-info {
