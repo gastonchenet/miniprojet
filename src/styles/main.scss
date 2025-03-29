@@ -95,10 +95,18 @@ a {
 
   .page-content-container .results {
     font-size: 1.25rem;
-    font-weight: 700;
     color: #333;
     margin-top: 2.5rem;
     margin-left: 2.5rem;
+
+    .query {
+      color: #666;
+      text-decoration: underline;
+    }
+
+    &::before {
+      content: "🔎 ";
+    }
   }
 
   .releases {

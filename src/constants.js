@@ -4,6 +4,8 @@ export const DISCOGS_HEADERS = {
   headers: {
     Authorization:
       "Discogs key=ObXNXjxZACXVRWGtaMlR, secret=JIPnNZpRmKadBUOfeLxwbzfTdrfKeOyG",
+    "User-Agent": "Diskitty/1.0",
+    "Content-Type": "application/json",
   },
 };
 

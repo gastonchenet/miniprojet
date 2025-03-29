@@ -9,7 +9,7 @@
     </router>
   </div>
   <script>
-    import { Router, Route, route, toRegexp, match, setBase } from "@riotjs/route";
+    import { Router, Route, route, router, toRegexp, match, setBase } from "@riotjs/route";
     import { auth, db, waitUntilAuthReady } from "./utils/firebase";
     import pages from "./pages";
 
@@ -20,6 +20,7 @@
     import Release from "./pages/release/index.riot";
     import Master from "./pages/master/index.riot";
     import Artist from "./pages/artist/index.riot";
+    import NotFound from "./pages/not-found/index.riot";
 
     export default {
       components: {
@@ -32,19 +33,22 @@
         Release,
         Master,
         Artist,
+        NotFound,
       },
       state: {
         pages,
         showNotFound: false,
       },
       onMounted(props, state) {
-        setBase("/");
+        router.on.value((path) => {
+          console.log(this.state.pages.map((p) => new RegExp(p.path.replace(/:[a-z0-9A-Z_-]+/g, "([a-z0-9A-Z_-]+)") + "$").test(path.replace(window.location.origin, ""))));
 
-        this.anyRouteStream = route("(.*)");
-        this.anyRouteStream.on.value((path) => this.update());
+          this.update({
+            showNotFound: !this.state.pages.some((p) => this.state.pages.map((p) => new RegExp(p.path.replace(/:[a-z0-9A-Z_-]+/g, "([a-z0-9A-Z_-]+)") + "$").test(path.replace(window.location.origin, ""))))
+          });
+        });
       },
       onUnmounted() {
-        this.anyRouteStream.end();
       },
     }
   </script>

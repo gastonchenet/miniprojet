@@ -1,14 +1,14 @@
 <searchbar>
   <form aria-label="search" class="searchbar" onsubmit={search}>
     <div>
-      <button onclick={toggleMenu} class="menu-button" type="button">
+      <button class="menu-button" type="button" onclick={toggleMenu}>
         <span>{state.type}</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" class="caret">
           <path fill="currentColor" d="m7 15l5-5l5 5z"/>
         </svg>
       </button>
       <div class="menu">
-        <button each={option in state.searchOptions} onclick={() => select(option)} class="element"  type="button">
+        <button each={option in state.searchOptions} onclick={() => select(option)} class="element" type="button">
           {option}
         </button>
       </div>
@@ -19,44 +19,41 @@
       placeholder="Search..."
       spellcheck="false"
       value={state.query}
-      oninput={findPreviews}
+      oninput={onSearchInput}
     />
     <button type="submit" class="search-button">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
         <path fill="currentColor" d="M9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l5.6 5.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-5.6-5.6q-.75.6-1.725.95T9.5 16m0-2q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14"/>
       </svg>    
     </button>
+    <div class="preview-results">
+      <a each={result in state.preview} class="preview" href={`/${state.type}/${result.id}`}>
+        <img src={result.thumb || placeholder} class="illustration" alt={result.title} />
+        <div class="info">
+          <h4 class="title">{result.title || result.artist}</h4>
+          <p class="artist" if={!!result.title}>{result.artist}</p>
+        </div>
+      </a>
+    </div>
   </form>
-  <div class="preview-results">
-    <a each={result in state.preview} class="preview" href={`/${result.type}/${result.id}`}>
-      <img src={result.thumb}>
-      <div>
-        <h4>{result.title}</h4>
-        <p>{result.artist}</p>
-      </div>
-    </a>
-  </div>
   <script>
     import { router } from "@riotjs/route";
     import appEvents from "../utils/events.js";
     import { search } from "../utils/api.js";
-
-    const selections = {
-      Artist: "artist",
-      Release: "release",
-      Master: "master",
-    };
+    import placeholder from "../assets/images/placeholder.png";
+    import { ItemType } from "../constants.js";
 
     let lastTyped = 0;
 
     export default {
       state: {
-        type: selections.Release,
-        searchOptions: Object.values(selections),
+        type: ItemType.Release,
+        searchOptions: Object.values(ItemType),
         query: "",
         preview: [],
         fetching: false,
       },
+      placeholder,
       select(option) {
         this.update({ type: option });
         this.toggleMenu();
@@ -66,10 +63,15 @@
       },
       async updatePreview(query = "") {
         this.update({ fetching: true });
-
-        const releases = await search(query, this.state.type, 1, 10);
+        const { results } = await search(query, this.state.type, 1, 10);
+        this.update({ preview: search.util.formatResults(results), fetching: false });
       },
-      findPreviews(e) {
+      onSearchInput(e) {
+        if (!e.target.value) {
+          this.update({ preview: [] });
+          return;
+        }
+
         lastTyped = Date.now();
 
         setTimeout(() => {
@@ -91,7 +93,7 @@
 
         this.update({
           query: url.searchParams.get("q") || "",
-          type: url.searchParams.get("type") || selections.Release,
+          type: url.searchParams.get("type") || ItemType.Release,
         });
 
         this.searchbarUpdateFunction = ((path) => {
@@ -106,9 +108,16 @@
         }).bind(this);
 
         router.on.value(this.searchbarUpdateFunction);
+
+        this.menuClickListener = window.addEventListener("click", (e) => {
+          if (!e.target.closest(".menu-button")) {
+            this.$(".menu")?.classList.remove("visible");
+          }
+        })
       },
       onBeforeUnmount() {
         router.off.value(this.searchbarUpdateFunction);
+        window.removeEventListener("click", this.menuClickListener);
       }
     }
   </script>

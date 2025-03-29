@@ -16,12 +16,11 @@
   <script>
     import { waitUntilAuthReady } from "../../utils/firebase.js";
     import { getFavorites } from "../../utils/favorites.js";
+    import { ItemType } from "../../constants.js";
 
     const selections = {
       All: null,
-      Artist: "artist",
-      Release: "release",
-      Master: "master",
+      ...ItemType,
     };
 
     export default {

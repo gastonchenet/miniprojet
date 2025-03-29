@@ -11,7 +11,7 @@
         <p class="year">{release.year}</p>
       </div>
       <div class="like-container" if={!props.hideLikeButton && state.showLikes}>
-        <like releaseId={release.id} liked={state.favorites[props.type || release.type].includes(release.id)} />
+        <like releaseId={release.id} liked={state.favorites[props.type || release.type]?.includes(release.id)} />
       </div>
     </button>
   </div>
@@ -57,7 +57,9 @@
         oldScrollTop = 0;
       },
       getColumns() {
-        const gridStyle = window.getComputedStyle(this.$(".releases-container"));
+        const releasesContainer = this.$(".releases-container");
+        if (!releasesContainer) return 0;
+        const gridStyle = window.getComputedStyle(releasesContainer);
         return gridStyle.gridTemplateColumns.split(/\s/).length;
       },
       onMounted(props) {

@@ -2,15 +2,15 @@
   <div class="content" data-page-scroller>
     <div if={state.updating} class="loader" />
     <div if={!state.updating && state.releases !== null} class="page-content-container">
-      <h2 class="results" if={state.fromSearch}>{state.items.toLocaleString("en-US")} results</h2>
+      <h2 class="results" if={state.fromSearch}>{state.items.toLocaleString("en-US")} results found for{" "}<span class="query">{state.query.trim()}</span></h2>
       <releases releases={state.releases} if={state.releases !== null} type={state.type} loadNextPage={loadNextPage} />
     </div>
   </div>
   <script>
     import { getCurrentRoute } from "@riotjs/route";
-    import { ITEMS_PER_PAGE, DISCOGS_HEADERS } from "../../constants.js";
     import { search } from "../../utils/api.js";
     import appEvents from "../../utils/events.js";
+    import { ItemType } from "../../constants.js";
 
     let currentPage = 1;
 
@@ -20,13 +20,15 @@
         releases: null,
         fromSearch: false,
         query: "",
-        type: "release",
+        type: ItemType.Release,
         updating: true,
       },
       getSearchParams() {
         const url = new URL(window.location.href);
         const query = url.searchParams.get("q") || "";
-        const type = url.searchParams.get("type") || "release";
+        const type = url.searchParams.get("type") || ItemType.Release;
+
+        this.update({ query, type, fromSearch: !!query });
 
         return { query, type };
       },

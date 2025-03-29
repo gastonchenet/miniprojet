@@ -65,6 +65,8 @@
     import { waitUntilAuthReady, auth } from "../../utils/firebase.js";
     import { fetchRelease } from "../../utils/api.js";
     import appEvents from "../../utils/events.js";
+    import { ItemType } from "../../constants.js";
+    import formatNote from "./formatNote.js";
 
     export default {
       state: {
@@ -93,21 +95,7 @@
           isFavorite: fav,
         });
 
-        if (release.notes) {
-          const note = release.notes
-            .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (_, url, text) => {
-              if (url.startsWith("http")) return text;
-              return `<a href='${url}' class='link'>${text}</a>`;
-            })
-            .replace(
-              /\[r=([^\]]*)\]/g,
-              "<a href='/release/$1' class='link'>here</a>"
-            )
-            .replace(/\[[^\]]*\]/g, "")
-            .trim();
-
-          this.$("pre.note").innerHTML = note[0].toUpperCase() + note.slice(1);
-        }
+        if (release.notes) this.$("pre.note").innerHTML = formatNote(release.notes);
 
         const like = this.$(".like");
 
@@ -125,7 +113,7 @@
                 artist: release.artists[0].name,
                 year: release.year,
               },
-              "release"
+              ItemType.Release
             );
           });
         }

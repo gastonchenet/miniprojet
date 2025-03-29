@@ -3,6 +3,7 @@ import "./styles/navbar.scss";
 import "./styles/auth.scss";
 import "./styles/release.scss";
 import "./styles/like.scss";
+import "./styles/not-found.scss";
 
 import "@riotjs/hot-reload";
 import { component } from "riot";

@@ -51,6 +51,8 @@
     import { toggleLike, isFavorite } from "../../utils/favorites.js";
     import { waitUntilAuthReady, auth } from "../../utils/firebase.js";
     import { fetchMaster } from "../../utils/api.js";
+    import { ItemType } from "../../constants.js";
+    import formatNote from "./formatNote.js";
 
     export default {
       state: {
@@ -77,25 +79,11 @@
           isFavorite: fav,
         });
 
-        if (master.notes) {
-          const note = master.notes
-            .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (match, url, text) => {
-              if (url.startsWith("http")) return text;
-              return `<a href='${url}' class='link'>${text}</a>`;
-            })
-            .replace(
-              /\[r=([^\]]*)\]/g,
-              "<a href='/master/$1' class='link'>here</a>"
-            )
-            .replace(/\[[^\]]*\]/g, "")
-            .trim();
-
-          this.$("pre.note").innerHTML = note[0].toUpperCase() + note.slice(1);
-        }
+        if (master.notes) this.$("pre.note").innerHTML = formatNote(master.notes);
 
         const like = this.$(".like");
 
-        this.likeListener = like.addEventListener("click", (e) => {
+        this.likeListener = like?.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
           like.classList.toggle("liked");
@@ -108,12 +96,12 @@
               artist: master.artists[0].name,
               year: master.year,
             },
-            "master"
+            ItemType.Master
           );
         });
       },
       onBeforeUnmount() {
-        this.$(".like").removeEventListener("click", this.likeListener);
+        this.$(".like")?.removeEventListener("click", this.likeListener);
       },
     };
   </script>

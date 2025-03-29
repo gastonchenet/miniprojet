@@ -36,6 +36,7 @@
     import { getFavorites } from "../utils/favorites";
     import appEvents from "../utils/events";
     import { waitUntilAuthReady } from "../utils/firebase";
+    import { ItemType } from "../constants";
 
     export default {
       state: {
@@ -43,7 +44,7 @@
         user: null,
       },
       gotoHome() {
-        appEvents.trigger("search", { query: "", type: "release" });
+        appEvents.trigger("search", { query: "", type: ItemType.Release });
       },
       async updateFavCount() {
         const favorites = await getFavorites();
