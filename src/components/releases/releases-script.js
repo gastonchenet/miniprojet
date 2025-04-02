@@ -12,6 +12,7 @@ export default {
 
   state: {
     releases: null,
+    currentPage: 1,
     favorites: {
       release: [],
       master: [],
@@ -117,7 +118,21 @@ export default {
         const releases = await this.props.loadNextPage(releasesLength);
 
         this.state.releases.push(...releases);
-        this.update({ loading: false });
+
+        this.update({
+          loading: false,
+          currentPage: this.state.currentPage + 1,
+        });
+
+        console.log(this.state.currentPage, this.props.lastPage);
+
+        if (this.state.currentPage >= this.props.lastPage) {
+          document
+            .querySelector("[data-page-scroller]")
+            ?.removeEventListener("scroll", this.scrollListener);
+
+          this.scrollListener = null;
+        }
       }).bind(this);
 
       document

@@ -40,7 +40,7 @@
     </div>
     <div class="content artist" if={state.releases !== null}>
       <h2 class="title">Releases <span class="results">({state.pagination.items.toLocaleString("en-US")})</span></h2>
-      <releases releases={state.releases} loadNextPage={loadNextPage} />
+      <releases releases={state.releases} loadNextPage={loadNextPage} lastPage={state.pagination.pages} />
     </div>
   </section>
   <script>

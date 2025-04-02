@@ -12,6 +12,7 @@ export default {
     query: "",
     type: ItemType.Release,
     updating: true,
+    lastPage: 0,
   },
 
   getSearchParams(searchData) {
@@ -51,6 +52,7 @@ export default {
       type,
       releases,
       items: data.pagination.items,
+      lastPage: data.pagination.pages,
       fromSearch: !!this.state.query,
       updating: false,
     });

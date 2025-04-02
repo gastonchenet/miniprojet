@@ -3,7 +3,13 @@
     <div if={state.updating} class="loader" />
     <div if={!state.updating && state.releases !== null} class="page-content-container">
       <h2 class="results" if={state.fromSearch}>{state.items.toLocaleString("en-US")} results found for{" "}<span class="query">{state.query.trim()}</span></h2>
-      <releases releases={state.releases} if={state.releases !== null} type={state.type} loadNextPage={loadNextPage} />
+      <releases
+        releases={state.releases}
+        if={state.releases !== null}
+        type={state.type}
+        loadNextPage={loadNextPage}
+        lastPage={state.lastPage}
+       />
     </div>
   </div>
   <script>
