@@ -1,6 +1,5 @@
 import { db, auth } from "./firebase.js";
 import { arrayUnion, arrayRemove } from "firebase/firestore";
-import observable from "@riotjs/observable";
 import appEvents from "./events.js";
 
 const fieldMap = {
@@ -9,7 +8,8 @@ const fieldMap = {
   master: "favoriteMasters",
 };
 
-let favoritesCache = {
+// Cache for favorites to avoid multiple calls to the database
+const favoritesCache = {
   release: [],
   artist: [],
   master: [],
@@ -23,6 +23,7 @@ let favoritesCache = {
 };
 
 export async function getFavorites() {
+  // Return the cached favorites if they are already loaded
   if (favoritesCache.filled) {
     return favoritesCache;
   }
@@ -39,6 +40,7 @@ export async function getFavorites() {
     },
   };
 
+  // If the user is not logged in, return an empty favorites object
   if (!auth.currentUser) return favorites;
 
   const userId = auth.currentUser.uid;
@@ -96,6 +98,8 @@ export async function toggleLike(favorite, type) {
 
   try {
     const doc = await userRef.get();
+
+    // Check if the user document exists
     if (!doc.exists) {
       console.error("User document not found");
       return;
@@ -127,5 +131,6 @@ export async function toggleLike(favorite, type) {
     console.error("Error updating favorites:", error);
   }
 
+  // Trigger the event to update the favorites count in the navbar
   appEvents.trigger("favoritesUpdated");
 }

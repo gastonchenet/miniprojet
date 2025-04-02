@@ -49,11 +49,13 @@ export default {
     }
 
     try {
+      // Sign up with email and password using Firebase
       const userCredentials = await auth.createUserWithEmailAndPassword(
         email,
         password
       );
 
+      // Attach the username to the user document in Firestore
       await db.collection("users").doc(userCredentials.user.uid).set({
         username,
         favoriteReleases: [],

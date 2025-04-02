@@ -8,6 +8,7 @@ import {
 } from "../../constants/global.js";
 
 export default {
+  // Constants
   PROJECT_TITLE,
   PROJECT_ROOT,
 
@@ -21,6 +22,7 @@ export default {
   },
 
   async onMounted() {
+    // Update favorites count when it changes
     this.updateFunc = (async () => {
       const favorites = await getFavorites();
       this.update({ favoritesCount: favorites.count });
@@ -28,12 +30,14 @@ export default {
 
     appEvents.on("favoritesUpdated", this.updateFunc);
 
+    // Update the navbar when the user logs in or out
     this.unsubAuthListener = auth.onAuthStateChanged(async () => {
       if (auth.currentUser) {
         const doc = await db
           .collection("users")
           .doc(auth.currentUser.uid)
           .get();
+
         const favorites = await getFavorites();
 
         this.update({

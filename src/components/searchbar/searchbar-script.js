@@ -27,19 +27,23 @@ export default {
   },
 
   emptyPreview() {
+    // Remove the preview and hide the blur
     this.update({ preview: [] });
     document.querySelector(".content-blur")?.classList.remove("visible");
   },
 
   async updatePreview(query = "") {
     const { results } = await search(query, this.state.type, 1, 10);
+
     if (
       !this.$(".search-field").value ||
       document.activeElement !== this.$(".search-field")
     )
       return this.emptyPreview();
+
     if (results.length > 0)
       document.querySelector(".content-blur")?.classList.add("visible");
+
     this.update({ preview: search.util.formatResults(results) });
   },
 
@@ -62,6 +66,7 @@ export default {
     const query = this.$(".search-field").value;
     const type = this.state.type;
 
+    // Redirect to the search page with the query and type
     router.push(`${PROJECT_ROOT}/?q=${query}&type=${type}`);
     appEvents.trigger("search", { query, type });
   },
@@ -77,13 +82,17 @@ export default {
     this.blurListener = (() => this.emptyPreview()).bind(this);
 
     this.searchbarUpdateFunction = ((path) => {
+      // If the path is relative, prepend the origin
       if (!path.startsWith("http")) {
         path = window.location.origin + path;
       }
 
       const url = new URL(path);
       let val = url.searchParams.get("q") || "";
+
+      // If the path is not the root, set the search field value to an empty string
       if (url.pathname !== "/") val = "";
+
       this.$(".search-field").value = val;
     }).bind(this);
 

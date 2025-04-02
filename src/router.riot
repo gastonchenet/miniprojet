@@ -26,6 +26,7 @@
       },
       onMounted(props, state) {
         router.on.value((path) => {
+          // Check if the path matches any of the defined routes, if not, show the 'not found' page
           this.update({
             showNotFound: !this.state.pages.some((p) =>
               new RegExp(

@@ -35,6 +35,7 @@ export default {
       isFavorite: fav,
     });
 
+    // Remove useless data from the release's note
     if (release.notes && this.$("pre.note"))
       this.$("pre.note").innerHTML = formatNote(release.notes);
 

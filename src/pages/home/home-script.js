@@ -35,11 +35,12 @@ export default {
     return search.util.formatResults(data.results);
   },
 
-  async fill(page, searchData) {
+  async fill(page = 1, searchData = null) {
     const { query, type } = this.getSearchParams(searchData);
     this.update({ updating: true });
     const data = await search(query, type, page);
     const releases = search.util.formatResults(data.results);
+    console.log(data);
 
     if (searchData && Object.keys(searchData).length) {
       appEvents.trigger("searchUpdated", releases);
@@ -53,12 +54,10 @@ export default {
       fromSearch: !!this.state.query,
       updating: false,
     });
-
-    console.log(data);
   },
 
   onMounted() {
-    this.fill(1);
+    this.fill();
     this.updateSearch = ((searchData) => this.fill(1, searchData)).bind(this);
     appEvents.on("search", this.updateSearch);
   },

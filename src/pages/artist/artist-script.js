@@ -7,6 +7,7 @@ import formatNote from "../../utils/formatNote.js";
 let currentPage = 1;
 
 export default {
+  // Constants
   PROJECT_ROOT,
 
   state: {
@@ -38,6 +39,7 @@ export default {
       ++currentPage,
       count
     );
+
     return releases;
   },
 
@@ -49,6 +51,7 @@ export default {
     console.log(releases);
     console.log(pagination);
 
+    // Remove useless data from the artist profile
     if (artist.profile && this.$("pre.note"))
       this.$("pre.note").innerHTML = formatNote(artist.profile);
 
@@ -79,13 +82,14 @@ export default {
     this.fill(props.params.id);
   },
 
+  onUpdated(props) {
+    // Check if the artist ID has changed, if so, fetch the new artist data
+    if (!this.state.artist || this.props.params.id === props.params.id) return;
+    this.fill(props.params.id);
+  },
+
   onBeforeUnmount() {
     if (this.likeListener)
       this.$(".like").removeEventListener("click", this.likeListener);
-  },
-
-  onUpdated(props) {
-    if (!this.state.artist || this.props.params.id === props.params.id) return;
-    this.fill(props.params.id);
   },
 };

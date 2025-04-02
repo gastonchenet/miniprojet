@@ -5,6 +5,7 @@ import { ItemType, PROJECT_ROOT } from "../../constants/global.js";
 import formatNote from "../../utils/formatNote.js";
 
 export default {
+  // Constants
   PROJECT_ROOT,
 
   state: {
@@ -33,6 +34,7 @@ export default {
       isFavorite: fav,
     });
 
+    // Remove useless data from the master's note
     if (master.notes && this.$("pre.note"))
       this.$("pre.note").innerHTML = formatNote(master.notes);
 

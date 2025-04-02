@@ -25,6 +25,7 @@ export async function search(
 
 search.util = {
   formatResults(results) {
+    // Format the results to match the expected structure
     return results.map((result) => ({
       id: result.id,
       title: result.title.split(/\s*-\s*/)[1],

@@ -15,4 +15,5 @@ import fillHead from "./utils/fillHead.js";
 registerGlobal();
 fillHead();
 
+// Initialize the router
 component(Router)(document.getElementById("app"));

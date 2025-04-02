@@ -1,4 +1,5 @@
 export default function formatNote(note) {
+  // Escape the note to remove any HTML custom tags and format it
   const escaped = note
     .replace(/\[url=([^\]]*)\]([^[]*)\[\/url\]/g, (_, url, text) => {
       if (url.startsWith("http")) return text;

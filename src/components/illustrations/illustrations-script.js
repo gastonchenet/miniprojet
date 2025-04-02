@@ -8,8 +8,10 @@ export default {
   },
 
   onMounted() {
+    // Set the first image as the default selected image
     this.selectImage(this.props.images[0].uri);
 
+    // Scroll illustrations horizontally on wheel scroll
     const selectionsContainer = this.$(".selections-container");
     if (!selectionsContainer) return;
     let lastScroll = 0;

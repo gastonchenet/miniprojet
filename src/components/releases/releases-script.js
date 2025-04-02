@@ -33,6 +33,7 @@ export default {
   },
 
   getColumns() {
+    // Get the number of columns in the releases container depending on the screen size
     const releasesContainer = this.$(".releases-container");
     if (!releasesContainer) return 0;
     const gridStyle = window.getComputedStyle(releasesContainer);
@@ -44,14 +45,14 @@ export default {
       this.update({ showLikes: !!auth.currentUser });
     });
 
+    // Update the releases when a search is made
     this.searchEvent = ((releases) => {
       this.update({ releases });
     }).bind(this);
 
-    appEvents.on("searchUpdated", this.searchEvent);
-
     let lastClick = [0, null];
 
+    // Slice the releases array to the number of columns
     if (this.props.loadNextPage) {
       const columns = this.getColumns();
       const releasesLength =
@@ -65,6 +66,7 @@ export default {
       ),
     });
 
+    // Get the favorites from the database
     if (!this.props.hideLikeButton) {
       waitUntilAuthReady().then(async () => {
         const favorites = await getFavorites();
@@ -79,6 +81,7 @@ export default {
       });
     }
 
+    // Load the next page of releases when the user scrolls to the bottom
     if (this.props.loadNextPage) {
       this.scrollListener = (async (e) => {
         const topButton = this.$(".top-button");
@@ -122,72 +125,72 @@ export default {
         ?.addEventListener("scroll", this.scrollListener);
     }
 
-    this.likeListener = this.$(".releases-container").addEventListener(
-      "click",
-      (e) => {
-        const a = e.target.closest(".release");
-        const b = e.target.closest(".like");
-        if (!a) return;
+    this.likeListener = ((e) => {
+      const a = e.target.closest(".release");
+      const b = e.target.closest(".like");
+      if (!a) return;
 
-        e.preventDefault();
-        e.stopPropagation();
+      e.preventDefault();
+      e.stopPropagation();
 
-        const releaseId = parseInt(a.getAttribute("data-release-id"));
-        const releaseType = a.getAttribute("data-release-type");
+      const releaseId = parseInt(a.getAttribute("data-release-id"));
+      const releaseType = a.getAttribute("data-release-type");
 
-        const title = a.querySelector(".title")?.textContent;
-        const artist = a.querySelector(".artist")?.textContent;
+      const title = a.querySelector(".title")?.textContent;
+      const artist = a.querySelector(".artist")?.textContent;
 
-        if (this.props.hideLikeButton) {
-          router.push(`${PROJECT_ROOT}/${releaseType}/${releaseId}`);
-          return;
-        }
-
-        if (b) {
-          b.classList.toggle("liked");
-
-          toggleLike(
-            {
-              id: releaseId,
-              title: artist ? title : undefined,
-              thumb: a.querySelector(".illustration").src,
-              artist: artist || title,
-              year: parseInt(a.querySelector(".year").textContent),
-            },
-            releaseType
-          );
-
-          return;
-        }
-
-        const like = a.querySelector(".like");
-        const now = Date.now();
-
-        if (lastClick[1] === releaseId && now - lastClick[0] < 250) {
-          like.classList.toggle("liked");
-
-          toggleLike(
-            {
-              id: releaseId,
-              title: artist ? title : undefined,
-              thumb: a.querySelector(".illustration").src,
-              artist: artist || title,
-              year: parseInt(a.querySelector(".year").textContent),
-            },
-            releaseType
-          );
-
-          lastClick = [0, null];
-        } else {
-          lastClick = [now, releaseId];
-
-          setTimeout(() => {
-            if (lastClick[1] !== releaseId) return;
-            router.push(`${PROJECT_ROOT}/${releaseType}/${releaseId}`);
-          }, 300);
-        }
+      if (this.props.hideLikeButton) {
+        router.push(`${PROJECT_ROOT}/${releaseType}/${releaseId}`);
+        return;
       }
-    );
+
+      if (b) {
+        b.classList.toggle("liked");
+
+        toggleLike(
+          {
+            id: releaseId,
+            title: artist ? title : undefined,
+            thumb: a.querySelector(".illustration").src,
+            artist: artist || title,
+            year: parseInt(a.querySelector(".year").textContent),
+          },
+          releaseType
+        );
+
+        return;
+      }
+
+      const like = a.querySelector(".like");
+      const now = Date.now();
+
+      if (lastClick[1] === releaseId && now - lastClick[0] < 250) {
+        like.classList.toggle("liked");
+
+        toggleLike(
+          {
+            id: releaseId,
+            title: artist ? title : undefined,
+            thumb: a.querySelector(".illustration").src,
+            artist: artist || title,
+            year: parseInt(a.querySelector(".year").textContent),
+          },
+          releaseType
+        );
+
+        lastClick = [0, null];
+      } else {
+        lastClick = [now, releaseId];
+
+        setTimeout(() => {
+          if (lastClick[1] !== releaseId) return;
+          router.push(`${PROJECT_ROOT}/${releaseType}/${releaseId}`);
+        }, 300);
+      }
+    }).bind(this);
+
+    appEvents.on("searchUpdated", this.searchEvent);
+    this.$(".releases-container").addEventListener("click", this.likeListener);
   },
 
   onBeforeUnmount() {

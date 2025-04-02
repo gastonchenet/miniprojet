@@ -27,6 +27,7 @@ export default {
       })
       .catch((error) => {
         this.update({
+          // Display an error message if firebase fails to sign in
           error: error.message.replace(/(Firebase:|\(.*\).?)/g, "").trim(),
         });
       });

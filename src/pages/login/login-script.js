@@ -33,6 +33,7 @@ export default {
     }
 
     try {
+      // Sign in with email and password using Firebase
       await auth.signInWithEmailAndPassword(email, password);
       router.push(PROJECT_ROOT + "/");
     } catch (error) {

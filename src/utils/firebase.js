@@ -18,9 +18,12 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 export async function waitUntilAuthReady() {
+  // Wait until Firebase Auth is ready
   return new Promise((resolve) => {
     const unsubscribe = auth.onAuthStateChanged(() => {
       unsubscribe();
+
+      // Resolve the promise with true if the user is logged in, false otherwise
       resolve(!!auth.currentUser);
     });
   });
