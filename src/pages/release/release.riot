@@ -26,7 +26,7 @@
         <h2 class="title">{state.release.title}<span if={state.release.year}>{" "}({state.release.year})</span></h2>
         <div class="artist-data">
           <h3 class="artist">
-            <a class="artist-href" href={`/artist/${state.release.artists[0].id}`}>{state.release.artists[0].name}</a>
+            <a class="artist-href" href={`${PROJECT_ROOT}/artist/${state.release.artists[0].id}`}>{state.release.artists[0].name}</a>
           </h3>
           <p class="country">{state.release.country}</p>
         </div>
@@ -51,7 +51,7 @@
               <div class="extra-artists">
                 <p each={artist in track.extraartists}>
                   <span>{artist.role}</span>{" - "}
-                  <a href={`/artist/${artist.id}`}>{artist.name}</a>
+                  <a href={`${PROJECT_ROOT}/artist/${artist.id}`}>{artist.name}</a>
                 </p>
               </div>
             </li>
@@ -59,71 +59,10 @@
         </div>
       </div>
     </div>
-    <c-footer title={props.title} />
+    <c-footer />
   </section>
   <script>
-    import { toggleLike, isFavorite } from "../../utils/favorites.js";
-    import { waitUntilAuthReady, auth } from "../../utils/firebase.js";
-    import { fetchRelease } from "../../utils/api.js";
-    import appEvents from "../../utils/events.js";
-    import { ItemType } from "../../constants.js";
-    import formatNote from "./formatNote.js";
-
-    export default {
-      state: {
-        release: null,
-        rating: null,
-        noteExpanded: false,
-        isFavorite: false,
-        loggedIn: false,
-      },
-      toggleExpandNotes() {
-        this.update({ noteExpanded: !this.state.noteExpanded });
-      },
-      async onMounted(props) {
-        this.state.loggedIn = await waitUntilAuthReady();
-
-        const { release, stats, fav } = await fetchRelease(props.params.id);
-
-        console.log(release);
-        console.log(stats);
-        console.log(fav);
-
-        this.update({
-          release,
-          rating: stats.rating,
-          selectedImage: release.images[0].uri,
-          isFavorite: fav,
-        });
-
-        if (release.notes && this.$("pre.note")) this.$("pre.note").innerHTML = formatNote(release.notes);
-
-        const like = this.$(".like");
-
-        if (like) {
-          this.likeListener = ((e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            like.classList.toggle("liked");
-
-            toggleLike(
-              {
-                id: release.id,
-                title: release.title,
-                thumb: release.thumb,
-                artist: release.artists[0].name,
-                year: release.year,
-              },
-              ItemType.Release
-            );
-          }).bind(this);
-        
-          like?.addEventListener("click", this.likeListener);
-        }
-      },
-      onBeforeUnmount() {
-        if (this.likeListener) this.$(".like").removeEventListener("click", this.likeListener);
-      },
-    };
+    import Script from "./release-script";
+    export default Script;
   </script>
 </release>

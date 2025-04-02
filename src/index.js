@@ -8,11 +8,11 @@ import "./styles/not-found.scss";
 
 import "@riotjs/hot-reload";
 import { component } from "riot";
-import registerGlobal from "./register-global.js";
+import registerGlobal from "./utils/registerComponents.js";
 import Router from "./router.riot";
+import fillHead from "./utils/fillHead.js";
 
 registerGlobal();
+fillHead();
 
-component(Router)(document.getElementById("app"), {
-  title: "Diskitty",
-});
+component(Router)(document.getElementById("app"));

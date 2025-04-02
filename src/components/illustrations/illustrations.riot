@@ -1,0 +1,14 @@
+<illustrations class="illustrations">
+  <img src={state.selectedImage} alt={props.title} class="selected" />
+  <div class="selections-container">
+    <div class="selections">
+      <button each={image in props.images} onclick={() => this.selectImage(image.uri)} class="select-button">
+        <img src={image.uri} alt={props.title} class="selectable-illustration" />
+      </button>
+    </div>
+  </div>
+  <script>
+    import Script from "./illustrations-script";
+    export default Script;
+  </script>
+</illustrations>

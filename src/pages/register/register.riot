@@ -1,7 +1,13 @@
-<login>
+<register>
   <section class="page-container">
-    <h1 class="title">Login</h1>
-    <form onsubmit={login} class="form">
+    <h1 class="title">Sign Up</h1>
+    <form onsubmit={register} class="form">
+      <div class="field">
+        <label for="username">Username</label>
+        <div class="field-container">
+          <input type="text" name="username" class="field-content" spellcheck="false" >
+        </div>
+      </div>
       <div class="field">
         <label for="email">Email</label>
         <div class="field-container">
@@ -22,8 +28,22 @@
           </button>
         </div>
       </div>
+      <div class="field">
+        <label for="confirm-password">Confirm Password</label>
+        <div class="field-container">
+          <input type="password" name="confirm-password" class="field-content" spellcheck="false">
+          <button type="button" onclick={toggleConfirmPasswordVisibility} class="password-visibility">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" if={state.confirmPasswordVisible}>
+              <path fill="currentColor" d="M12 9a3 3 0 0 0-3 3a3 3 0 0 0 3 3a3 3 0 0 0 3-3a3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5a5 5 0 0 1 5-5a5 5 0 0 1 5 5a5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"/>
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" if={!state.confirmPasswordVisible}>
+              <path fill="currentColor" d="M11.83 9L15 12.16V12a3 3 0 0 0-3-3zm-4.3.8l1.55 1.55c-.05.21-.08.42-.08.65a3 3 0 0 0 3 3c.22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53a5 5 0 0 1-5-5c0-.79.2-1.53.53-2.2M2 4.27l2.28 2.28l.45.45C3.08 8.3 1.78 10 1 12c1.73 4.39 6 7.5 11 7.5c1.55 0 3.03-.3 4.38-.84l.43.42L19.73 22L21 20.73L3.27 3M12 7a5 5 0 0 1 5 5c0 .64-.13 1.26-.36 1.82l2.93 2.93c1.5-1.25 2.7-2.89 3.43-4.75c-1.73-4.39-6-7.5-11-7.5c-1.4 0-2.74.25-4 .7l2.17 2.15C10.74 7.13 11.35 7 12 7"/>
+            </svg>
+          </button>
+        </div>
+      </div>
       <p class="error" if={state.error !== null}>{state.error}</p>
-      <button type="submit" class="submit-button">Login</button>
+      <button type="submit" class="submit-button">Sign Up</button>
       <div class="or">
         <span class="line"></span>
         <span class="text">OR</span>
@@ -33,45 +53,7 @@
     </form>
   </section>
   <script>
-    import { auth, waitUntilAuthReady } from "../../utils/firebase.js";
-    import { router } from "@riotjs/route";
-
-    export default {
-      state: {
-        passwordVisible: false,
-      },
-      async onMounted() {
-        await waitUntilAuthReady();
-        if (auth.currentUser) router.push("/");
-      },
-      togglePasswordVisibility() {
-        const passwordField = this.$("input[name='password']");
-        passwordField.type =
-          passwordField.type === "password" ? "text" : "password";
-
-        this.update({ passwordVisible: !this.state.passwordVisible });
-      },
-      async login(e) {
-        e.preventDefault();
-
-        this.update({ error: null });
-
-        const email = this.$("input[name='email']").value;
-        const password = this.$("input[name='password']").value;
-
-        if (!email || !password) {
-          return this.update({ error: "Please fill in all fields" });
-        }
-
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          router.push("/");
-        } catch (error) {
-          this.update({
-            error: error.message.replace(/(Firebase:|\(.*\).?)/g, "").trim(),
-          });
-        }
-      },
-    };
+    import Script from "./register-script";
+    export default Script;
   </script>
-</login>
+</register>

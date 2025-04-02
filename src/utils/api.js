@@ -1,4 +1,8 @@
-import { DISCOGS_HEADERS, ITEMS_PER_PAGE, ItemType } from "../constants.js";
+import {
+  DISCOGS_HEADERS,
+  ITEMS_PER_PAGE,
+  ItemType,
+} from "../constants/global.js";
 import { isFavorite } from "./favorites.js";
 
 export async function search(

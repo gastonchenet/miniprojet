@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteBase /~chenet/
+
+RewriteCond %{REQUEST_URI} !^/~chenet/index\.html$
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /~chenet/index.html [L,QSA]

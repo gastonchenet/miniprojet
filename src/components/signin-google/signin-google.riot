@@ -9,35 +9,7 @@
     <span>Sign in with Google</span>
   </button>
   <script>
-    import firebase from "firebase/compat/app";
-    import { router } from "@riotjs/route";
-    import { auth, db } from "../utils/firebase";
-
-    export default {
-      signinWithGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-
-        auth.signInWithPopup(provider).then(async (result) => {
-          const user = result.user;
-
-          const userDoc = await db.collection("users").doc(user.uid).get();
-
-          if (!userDoc) {
-            await db.collection("users").doc(user.uid).set({
-              username: user.displayName,
-              favoriteReleases: [],
-              favoriteArtists: [],
-              favoriteMasters: [],
-            });
-          }
-
-          router.push("/");
-        }).catch((error) => {
-          this.update({
-            error: error.message.replace(/(Firebase:|\(.*\).?)/g, "").trim()
-          });
-        });
-      }
-    }
+    import Script from "./signin-google-script";
+    export default Script;
   </script>
 </signin-google>

@@ -1,0 +1,32 @@
+<releases class="releases">
+  <div class="releases-container">
+    <button each={release in (state.releases ?? props.releases)} class="release" data-release-id={release.id} data-release-type={props.type || release.type}>
+      <div class="illustration-container">
+        <img src={release.thumb || this.placeholder} alt={release.title} class="illustration" />
+        <p if={!props.type} class={`type ${release.type}`}>{release.type}</p>
+      </div>
+      <div class="text-info">
+        <h2 class="title" if={release.title}>{release.title}</h2>
+        <p class={release.title ? "artist" : state.artistOnly ? "title artist-title" : "title"}>{release.artist}</p>
+        <p class="year">{release.year}</p>
+      </div>
+      <div class="like-container" if={!props.hideLikeButton && state.showLikes}>
+        <like releaseId={release.id} liked={state.favorites[props.type || release.type]?.includes(release.id)} />
+      </div>
+    </button>
+  </div>
+  <div class="releases-loader">
+    <div if={state.loading} class="loader" />
+  </div>
+  <button class="top-button hidden" onclick={returnTop}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+      <path fill="currentColor" fill-rule="evenodd" d="M12 20.75a.75.75 0 0 0 .75-.75v-9.25h-1.5V20c0 .414.336.75.75.75" clip-rule="evenodd" opacity="0.5"/>
+      <path fill="currentColor" d="M6 10.75a.75.75 0 0 1-.53-1.28l6-6a.75.75 0 0 1 1.06 0l6 6a.75.75 0 0 1-.53 1.28z"/>
+    </svg>
+    <span>Return to top</span>
+  </button>
+  <script>
+    import Script from "./releases-script";
+    export default Script;
+  </script>
+</releases>

@@ -2,10 +2,16 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 
+import {
+  FIREBASE_API_KEY,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_PROJECT_ID,
+} from "../constants/global.js";
+
 firebase.initializeApp({
-  apiKey: "AIzaSyD9AGJjSHp8zlA2NhnS0y1mMda8XwpDe-c",
-  authDomain: "riot-a9eca.firebaseapp.com",
-  projectId: "riot-a9eca",
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  projectId: FIREBASE_PROJECT_ID,
 });
 
 const auth = firebase.auth();

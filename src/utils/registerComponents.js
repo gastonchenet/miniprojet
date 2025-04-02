@@ -2,20 +2,16 @@ import { register } from "riot";
 
 const basename = (path, extension = "") => {
   const name = path.split("/").reverse()[0].replace(extension, "");
-
-  if (name === "index") {
-    return path.split("/").reverse()[1];
-  }
-
+  if (name === "index") return path.split("/").reverse()[1];
   return name;
 };
 
-const globalComponentsContext = import.meta.webpackContext("./components/", {
+const globalComponentsContext = import.meta.webpackContext("../components/", {
   recursive: true,
   regExp: /[a-zA-Z0-9-]+\.riot/,
 });
 
-const pagesComponentsContext = import.meta.webpackContext("./pages/", {
+const pagesComponentsContext = import.meta.webpackContext("../pages/", {
   recursive: true,
   regExp: /[a-zA-Z0-9-]+\.riot/,
 });
