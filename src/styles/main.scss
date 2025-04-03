@@ -129,10 +129,6 @@ a {
       color: #666;
       text-decoration: underline;
     }
-
-    &::before {
-      content: "\01F50E ";
-    }
   }
 
   .releases {

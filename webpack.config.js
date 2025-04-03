@@ -1,9 +1,10 @@
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import WebpackBundleAnalyzer from "webpack-bundle-analyzer";
+import TerserPlugin from "terser-webpack-plugin";
 import path from "node:path";
 
-const PROJECT_ROOT = "";
+const PROJECT_ROOT = "/~chenet";
 
 export default {
   entry: {
@@ -41,6 +42,17 @@ export default {
         },
       },
     },
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          output: {
+            ascii_only: true,
+            comments: false,
+          },
+        },
+      }),
+    ],
   },
   devServer: {
     open: true,
