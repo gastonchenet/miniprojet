@@ -12,7 +12,7 @@ export async function search(
   count = ITEMS_PER_PAGE
 ) {
   const url = new URL("https://api.discogs.com/database/search");
-  url.searchParams.append("q", query);
+  url.searchParams.append("q", query.trim());
   url.searchParams.append("type", type);
   url.searchParams.append("page", page);
   url.searchParams.append("per_page", count);
