@@ -68,6 +68,7 @@ export default {
     this.updateSearch = ((searchData) => this.fill(1, searchData)).bind(this);
     appEvents.on("search", this.updateSearch);
 
+    // Detects if the mouse is on the bottom of the screen and adds a class to the footer
     this.mouseOnBottom = ((e) => {
       const buttonClasses = this.$(".see-footer")?.classList;
       if (!buttonClasses) return;

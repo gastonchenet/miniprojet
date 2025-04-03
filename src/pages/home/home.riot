@@ -1,7 +1,7 @@
 <home>
   <div class="main-container">
-    <div if={state.updating} class="loader" />
     <div class="content" data-page-scroller>
+      <div if={state.updating} class="loader" />
       <div if={!state.updating && state.releases !== null} class="page-content-container">
         <h2 class="results" if={state.fromSearch}>&#x1F50E; {state.items.toLocaleString("en-US")} results found for{" "}<span class="query">{state.query.trim()}</span></h2>
         <releases
