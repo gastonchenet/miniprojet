@@ -90,5 +90,6 @@ export default {
 
   onUnmounted() {
     appEvents.off("search", this.updateSearch);
+    document.removeEventListener("mousemove", this.mouseOnBottom);
   },
 };
