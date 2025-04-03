@@ -31,7 +31,7 @@ export default {
     this.update({
       release,
       rating: stats.rating,
-      selectedImage: release.images[0].uri,
+      selectedImage: release?.images[0]?.uri,
       isFavorite: fav,
     });
 
