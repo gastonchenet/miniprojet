@@ -30,6 +30,11 @@ export default {
     return { query, type };
   },
 
+  toggleFooter() {
+    this.$(".footer-container").classList.toggle("hidden");
+    this.$(".caret").classList.toggle("deployed");
+  },
+
   async loadNextPage(count) {
     const { query, type } = this.getSearchParams();
     const data = await search(query, type, ++currentPage, count);
@@ -62,6 +67,25 @@ export default {
     this.fill();
     this.updateSearch = ((searchData) => this.fill(1, searchData)).bind(this);
     appEvents.on("search", this.updateSearch);
+
+    this.mouseOnBottom = ((e) => {
+      const buttonClasses = this.$(".see-footer")?.classList;
+      if (!buttonClasses) return;
+
+      if (
+        e.clientY > window.innerHeight - 100 &&
+        !buttonClasses.contains("touchable")
+      ) {
+        buttonClasses.add("touchable");
+      } else if (
+        e.clientY <= window.innerHeight - 100 &&
+        buttonClasses.contains("touchable")
+      ) {
+        buttonClasses.remove("touchable");
+      }
+    }).bind(this);
+
+    document.addEventListener("mousemove", this.mouseOnBottom);
   },
 
   onUnmounted() {

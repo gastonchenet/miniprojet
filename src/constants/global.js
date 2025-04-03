@@ -1,7 +1,7 @@
 // Project info
 export const PROJECT_TITLE = "Diskitty";
 export const PROJECT_DESCRIPTION = `Discover, share, and enjoy music with ${PROJECT_TITLE}.`;
-export const PROJECT_ROOT = "/~chenet";
+export const PROJECT_ROOT = "";
 
 // Firebase configuration
 export const FIREBASE_API_KEY = "AIzaSyD9AGJjSHp8zlA2NhnS0y1mMda8XwpDe-c";

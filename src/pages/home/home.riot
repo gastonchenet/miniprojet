@@ -1,15 +1,25 @@
 <home>
-  <div class="content" data-page-scroller>
+  <div class="main-container">
     <div if={state.updating} class="loader" />
-    <div if={!state.updating && state.releases !== null} class="page-content-container">
-      <h2 class="results" if={state.fromSearch}>&#x1F50E; {state.items.toLocaleString("en-US")} results found for{" "}<span class="query">{state.query.trim()}</span></h2>
-      <releases
-        releases={state.releases}
-        if={state.releases !== null}
-        type={state.type}
-        loadNextPage={loadNextPage}
-        lastPage={state.lastPage}
-       />
+    <div class="content" data-page-scroller>
+      <div if={!state.updating && state.releases !== null} class="page-content-container">
+        <h2 class="results" if={state.fromSearch}>&#x1F50E; {state.items.toLocaleString("en-US")} results found for{" "}<span class="query">{state.query.trim()}</span></h2>
+        <releases
+          releases={state.releases}
+          if={state.releases !== null}
+          type={state.type}
+          loadNextPage={loadNextPage}
+          lastPage={state.lastPage}
+        />
+      </div>
+    </div>
+    <div class="footer-container hidden">
+      <button class="see-footer" onclick={toggleFooter}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="caret">
+          <path fill="currentColor" d="m7 15l5-5l5 5z"/>
+        </svg>
+      </button>
+      <c-footer />
     </div>
   </div>
   <script>

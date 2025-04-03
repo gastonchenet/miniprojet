@@ -9,12 +9,23 @@
   color: #fff;
   z-index: 998;
 
+  @media screen and (max-width: 990px) {
+    gap: 2rem;
+    padding-inline: 1rem;
+  }
+
   .app-title {
     display: flex;
     gap: 0.4rem;
     align-items: center;
     text-decoration: none;
     color: #fff;
+
+    @media screen and (max-width: 990px) {
+      .title-content {
+        display: none;
+      }
+    }
   }
 
   .searchbar {
@@ -31,6 +42,11 @@
       padding: 0.6rem 0.75rem;
       width: 350px;
       color: #ddd;
+      transition: 200ms ease;
+
+      @media screen and (max-width: 1174px) {
+        width: 250px;
+      }
     }
 
     .search-button {
@@ -260,6 +276,10 @@
       display: flex;
       align-items: center;
       gap: 0.4rem;
+
+      @media screen and (max-width: 820px) {
+        display: none;
+      }
     }
 
     .favorites {
@@ -271,6 +291,10 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+
+      @media screen and (max-width: 820px) {
+        margin-right: 0.5rem;
+      }
 
       .star {
         color: #f8d74e;
@@ -290,6 +314,12 @@
 
       &:hover::before {
         width: 100%;
+      }
+
+      @media screen and (max-width: 1036px) {
+        .count {
+          display: none;
+        }
       }
     }
   }

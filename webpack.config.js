@@ -4,7 +4,7 @@ import WebpackBundleAnalyzer from "webpack-bundle-analyzer";
 import TerserPlugin from "terser-webpack-plugin";
 import path from "node:path";
 
-const PROJECT_ROOT = "/~chenet";
+const PROJECT_ROOT = "";
 
 export default {
   entry: {
@@ -42,17 +42,17 @@ export default {
         },
       },
     },
-    minimize: true,
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          output: {
-            ascii_only: true,
-            comments: false,
-          },
-        },
-      }),
-    ],
+    // minimize: true,
+    // minimizer: [
+    //   new TerserPlugin({
+    //     terserOptions: {
+    //       output: {
+    //         ascii_only: true,
+    //         comments: false,
+    //       },
+    //     },
+    //   }),
+    // ],
   },
   devServer: {
     open: true,
